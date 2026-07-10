@@ -111,3 +111,33 @@ def create_match(match: MatchCreate):
         connection.commit()
 
     return {"message": "Match created"}
+
+@app.get("/stats")
+def get_stats():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("""
+                SELECT
+                    p.name,
+                    m.average,
+                    m.checkout_percentage,
+                    m.hundred_eighty_count
+                FROM matches m
+                JOIN players p
+                    ON p.id = m.player_id
+            """)
+        )
+
+        stats = []
+
+        for row in result:
+            stats.append(
+                {
+                    "player": row.name,
+                    "average": row.average,
+                    "checkout_percentage": row.checkout_percentage,
+                    "hundred_eighty_count": row.hundred_eighty_count
+                }
+            )
+
+        return stats
