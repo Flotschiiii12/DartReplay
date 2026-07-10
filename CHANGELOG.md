@@ -30,3 +30,49 @@
 - Infrastruktur auf GitHub veröffentlicht
 - FastAPI Backend produktiv eingerichtet
 - PostgreSQL Datenbank produktiv eingerichtet
+
+- ## v0.2.2
+
+### Datenbank
+
+- SQLAlchemy installiert
+- PostgreSQL erfolgreich mit FastAPI verbunden
+- Datenbankverbindung erfolgreich getestet
+
+### Backend
+
+- Datenbank-Engine zentralisiert
+- Testskript für Verbindungsprüfung erstellt
+
+- ## v0.2.3
+
+### Datenbank
+
+- Datenbankschema erstellt
+- Players-Tabelle angelegt
+- Matches-Tabelle angelegt
+
+### Backend
+
+- SQLAlchemy-Models erstellt
+- Automatische Tabellenerstellung implementiert
+
+`
+## v0.2.4
+
+### Player API
+
+- GET /players implementiert
+- POST /players implementiert
+- Swagger UI erfolgreich verwendet
+
+### Datenbank
+
+- Erste Testdaten gespeichert
+- PostgreSQL-Schreibzugriffe getestet
+- PostgreSQL-Lesezugriffe getestet
+
+### DartReplay
+
+- Erster Spieler erfolgreich gespeichert
+- Erste Daten erfolgreich aus PostgreSQL abgerufen
