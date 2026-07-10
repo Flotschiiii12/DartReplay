@@ -23,3 +23,10 @@
 - Python 3 installiert
 - FastAPI installiert
 - Erste API Route erstellt
+
+## v0.2.1
+
+- GitHub Repository mit VPS verbunden
+- Infrastruktur auf GitHub veröffentlicht
+- FastAPI Backend produktiv eingerichtet
+- PostgreSQL Datenbank produktiv eingerichtet
