@@ -12,11 +12,11 @@
 
 ## Phase 1 – Infrastruktur
 
-- [ ] VPS aufsetzen
-- [ ] Ubuntu Server installieren
-- [ ] Docker installieren
-- [ ] PostgreSQL einrichten
-- [ ] FastAPI Projekt starten
+- [x] VPS aufsetzen
+- [x] Ubuntu Server installieren
+- [x] Docker installieren
+- [x] PostgreSQL einrichten
+- [x] FastAPI Projekt starten
 
 ---
 
