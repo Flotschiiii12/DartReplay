@@ -51,7 +51,8 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 
 Architektur und Roadmap erstellt.
 
-### Aktueller Stand
+
+# ✅ Aktueller Stand
 
 ## Infrastruktur
 
@@ -77,6 +78,7 @@ Architektur und Roadmap erstellt.
 - ✅ SQLAlchemy integriert
 - ✅ FastAPI erfolgreich mit PostgreSQL verbunden
 - ✅ Datenbankverbindung erfolgreich getestet
+
 
 
 Replay every great moment.
