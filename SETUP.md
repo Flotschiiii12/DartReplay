@@ -24,3 +24,11 @@ Antwort:
 {
   "message": "Welcome to DartReplay"
 }
+## Infrastrukturstatus
+
+- VPS eingerichtet
+- SSH Zugriff aktiv
+- Docker aktiv
+- PostgreSQL aktiv
+- FastAPI aktiv
+- GitHub Synchronisierung aktiv
