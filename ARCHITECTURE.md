@@ -14,7 +14,7 @@
                         │
                         ▼
                  Replay Engine
-                        │
+                        │ 
               ┌─────────┴─────────┐
               ▼                   ▼
          Board Cam          Player Cam
