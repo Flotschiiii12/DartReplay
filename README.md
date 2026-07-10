@@ -50,6 +50,7 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 🚧 Konzeptphase
 
 Architektur und Roadmap erstellt.
+
 ### Aktueller Stand
 
 ## Infrastruktur
