@@ -11,3 +11,15 @@
 - Roadmap erstellt
 - VPS festgelegt
 - 2 Reolink E1 Pro Kameras beschafft
+
+## v0.2.0
+
+### Infrastruktur
+
+- Ubuntu Server eingerichtet
+- Docker installiert
+- Docker Compose eingerichtet
+- PostgreSQL Container erstellt
+- Python 3 installiert
+- FastAPI installiert
+- Erste API Route erstellt
