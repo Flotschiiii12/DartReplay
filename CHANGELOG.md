@@ -76,3 +76,31 @@
 
 - Erster Spieler erfolgreich gespeichert
 - Erste Daten erfolgreich aus PostgreSQL abgerufen
+
+- ## v0.2.5
+
+### Match API
+
+- GET /matches implementiert
+- POST /matches implementiert
+- Erste Matchdaten gespeichert
+- Matchdaten erfolgreich aus PostgreSQL abrufbar
+
+### Datenbank
+
+- Matches-Tabelle produktiv genutzt
+- Verknüpfung zwischen Spielern und Matches getestet
+
+- ## v0.2.6
+
+### Statistics API
+
+- Statistik-Endpunkt (/stats) erstellt
+- SQL JOIN zwischen Players und Matches implementiert
+- Player- und Matchdaten erfolgreich verknüpft
+- Erste Statistiken erfolgreich erzeugt und ausgegeben
+
+### Backend
+
+- Erweiterte Datenabfragen implementiert
+- Grundlage für SCOLIA-Import vorbereitet
