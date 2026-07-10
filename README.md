@@ -50,28 +50,33 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 🚧 Konzeptphase
 
 Architektur und Roadmap erstellt.
-## Aktueller Stand
+### Aktueller Stand
 
-✅ VPS
-✅ Ubuntu
-✅ SSH
-✅ Git
-✅ Docker
-✅ Docker Compose
-✅ PostgreSQL
-✅ Python
-✅ FastAPI
-✅ Erste API
-✅ GitHub
+## Infrastruktur
 
-⬜ PostgreSQL ↔ FastAPI
-⬜ Players Tabelle
-⬜ Matches Tabelle
-⬜ Discord Bot
-⬜ Dashboard
-⬜ Replay Engine
-⬜ Kamera-Anbindung
-## Vision
+- ✅ VPS eingerichtet
+- ✅ Ubuntu 22.04 LTS installiert
+- ✅ SSH-Zugriff eingerichtet
+- ✅ Git konfiguriert
+- ✅ GitHub Repository angebunden
+- ✅ Docker installiert
+- ✅ Docker Compose installiert
+
+## Backend
+
+- ✅ Python 3 installiert
+- ✅ FastAPI eingerichtet
+- ✅ Swagger API Dokumentation verfügbar (`/docs`)
+- ✅ Erste produktive API erstellt
+
+## Datenbank
+
+- ✅ PostgreSQL eingerichtet
+- ✅ PostgreSQL läuft in Docker
+- ✅ SQLAlchemy integriert
+- ✅ FastAPI erfolgreich mit PostgreSQL verbunden
+- ✅ Datenbankverbindung erfolgreich getestet
+
 
 Replay every great moment.
 
