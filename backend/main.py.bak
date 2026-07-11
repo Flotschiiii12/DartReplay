@@ -254,31 +254,6 @@ def get_replay_triggers():
 
         return triggers
 
-@app.get("/replay-queue")
-def get_replay_queue():
-    with engine.connect() as connection:
-
-        result = connection.execute(
-            text("""
-                SELECT *
-                FROM replay_queue
-                ORDER BY id DESC
-            """)
-        )
-
-        queue = []
-
-        for row in result:
-            queue.append(
-                {
-                    "id": row.id,
-                    "trigger_id": row.trigger_id,
-                    "status": row.status,
-                    "created_at": row.created_at
-                }
-            )
-
-        return queue
 
 @app.get("/highlights")
 def get_highlights():
@@ -327,43 +302,43 @@ def get_highlights():
             highlight_id = result.fetchone()[0]
 
             result = connection.execute(
-                text("""
-                    INSERT INTO replay_triggers
-                    (
-                        highlight_id,
-                        trigger_type,
-                        created_at
-                    )
-                    VALUES
-                    (
-                        :highlight_id,
-                        '180',
-                        NOW()::text
-                    )
-                    RETURNING id
-                """),
-                {"highlight_id": highlight_id}
-            )
+    text("""
+        INSERT INTO replay_triggers
+        (
+            highlight_id,
+            trigger_type,
+            created_at
+        )
+        VALUES
+        (
+            :highlight_id,
+            '180',
+            NOW()::text
+        )
+        RETURNING id
+    """),
+    {"highlight_id": highlight_id}
+)
 
-            trigger_id = result.fetchone()[0]
+trigger_id = result.fetchone()[0]
 
-            connection.execute(
-                text("""
-                    INSERT INTO replay_queue
-                    (
-                        trigger_id,
-                        status,
-                        created_at
-                    )
-                    VALUES
-                    (
-                        :trigger_id,
-                        'PENDING',
-                        NOW()::text
-                    )
-                """),
-                {"trigger_id": trigger_id}
-            )
+connection.execute(
+    text("""
+        INSERT INTO replay_queue
+        (
+            trigger_id,
+            status,
+            created_at
+        )
+        VALUES
+        (
+            :trigger_id,
+            'PENDING',
+            NOW()::text
+        )
+    """),
+    {"trigger_id": trigger_id}
+)
 
             connection.commit()
 
@@ -376,24 +351,28 @@ def get_highlights():
             "highlight_detected": False
         }
 
-from pathlib import Path
+@app.get("/replay-queue")
+def get_replay_queue():
+    with engine.connect() as connection:
 
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM replay_queue
+                ORDER BY id DESC
+            """)
+        )
 
-@app.get("/replays")
-def get_replays():
+        queue = []
 
-    replay_dir = Path(
-        "/opt/dartreplay/replays"
-    )
-
-    replays = []
-
-    for file in replay_dir.glob("*.json"):
-
-        with open(file, "r") as replay_file:
-
-            replays.append(
-                replay_file.read()
+        for row in result:
+            queue.append(
+                {
+                    "id": row.id,
+                    "trigger_id": row.trigger_id,
+                    "status": row.status,
+                    "created_at": row.created_at
+                }
             )
 
-    return replays
+        return queue

@@ -35,3 +35,34 @@ class Throw(Base):
     bounceout = Column(Boolean)
 
     detection_time = Column(String)
+
+class Highlight(Base):
+    __tablename__ = "highlights"
+
+    id = Column(Integer, primary_key=True)
+
+    highlight_type = Column(String)
+
+    created_at = Column(String)
+
+class ReplayTrigger(Base):
+    __tablename__ = "replay_triggers"
+
+    id = Column(Integer, primary_key=True)
+
+    highlight_id = Column(Integer)
+
+    trigger_type = Column(String)
+
+    created_at = Column(String)
+
+class ReplayQueue(Base):
+    __tablename__ = "replay_queue"
+
+    id = Column(Integer, primary_key=True)
+
+    trigger_id = Column(Integer)
+
+    status = Column(String)
+
+    created_at = Column(String)
