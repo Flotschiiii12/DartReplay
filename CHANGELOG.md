@@ -126,3 +126,11 @@
 - THROW_DETECTED Events automatisch gespeichert
 - Erste echte SCOLIA-Würfe in PostgreSQL gespeichert
 - Live-WebSocket-Daten erfolgreich persistiert
+
+- ## v0.2.9
+
+### Throw API
+
+- GET /throws implementiert
+- Echte SCOLIA-Würfe über FastAPI abrufbar
+- Wurfdaten erfolgreich aus PostgreSQL ausgelesen
