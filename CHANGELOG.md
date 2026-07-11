@@ -118,3 +118,11 @@
 - HELLO_CLIENT erfolgreich empfangen
 - Ersten echten THROW_DETECTED Event empfangen
 - Live-Kommunikation mit dem Board erfolgreich getestet
+
+- ## v0.2.8
+
+### Throw Persistence
+
+- THROW_DETECTED Events automatisch gespeichert
+- Erste echte SCOLIA-Würfe in PostgreSQL gespeichert
+- Live-WebSocket-Daten erfolgreich persistiert
