@@ -164,3 +164,74 @@ def get_throws():
             )
 
         return throws
+
+@app.get("/throw-stats")
+def get_throw_stats():
+    with engine.connect() as connection:
+
+        total = connection.execute(
+            text("SELECT COUNT(*) FROM throws")
+        ).scalar()
+
+        doubles = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE sector LIKE 'D%'"
+            )
+        ).scalar()
+
+        trebles = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE sector LIKE 'T%'"
+            )
+        ).scalar()
+
+        bounceouts = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE bounceout = true"
+            )
+        ).scalar()
+
+        singles = total - doubles - trebles
+
+        return {
+            "total_throws": total,
+            "single_hits": singles,
+            "double_hits": doubles,
+            "treble_hits": trebles,
+            "bounceouts": bounceouts
+        }
+@app.get("/highlights")
+def get_highlights():
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return {
+                "highlight_detected": False
+            }
+
+        sectors = [
+            throws[0].sector,
+            throws[1].sector,
+            throws[2].sector
+        ]
+
+        if sectors == ["T20", "T20", "T20"]:
+            return {
+                "highlight_detected": True,
+                "type": "180"
+            }
+
+        return {
+            "highlight_detected": False
+        }
