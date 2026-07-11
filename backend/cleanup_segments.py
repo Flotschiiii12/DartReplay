@@ -1,19 +1,26 @@
 from pathlib import Path
 
-segment_dir = Path("/opt/dartreplay/camera-segments")
+SEGMENT_DIR = Path(
+    "/opt/dartreplay/camera-segments"
+)
+
+MAX_SEGMENTS = 30
 
 files = sorted(
-    segment_dir.glob("*.mp4"),
+    SEGMENT_DIR.glob("*.mp4"),
     key=lambda f: f.stat().st_mtime
 )
 
-keep = 30
+while len(files) > MAX_SEGMENTS:
 
-if len(files) > keep:
+    oldest = files.pop(0)
 
-    for file in files[:-keep]:
-        file.unlink()
-        print(f"Gelöscht: {file.name}")
+    print(
+        f"Lösche: {oldest.name}"
+    )
 
-else:
-    print("Nichts zu löschen")
+    oldest.unlink()
+
+print(
+    f"Aktuelle Segmente: {len(files)}"
+)

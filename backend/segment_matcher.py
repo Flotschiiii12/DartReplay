@@ -1,38 +1,39 @@
 from datetime import datetime
+from pathlib import Path
 
-from segment_index import get_segments
 
-
-def find_segment_for_timestamp(timestamp):
+def find_segment_for_timestamp(
+    timestamp,
+    segment_directory
+):
 
     target = datetime.strptime(
         timestamp,
         "%Y-%m-%d %H:%M:%S"
     )
 
+    segments = sorted(
+        Path(segment_directory).glob("*.mp4")
+    )
+
     best_match = None
 
-    for segment in get_segments():
+    for segment in segments:
 
         segment_time = datetime.strptime(
-            segment["timestamp"],
+            segment.stem.replace(
+                "segment_",
+                ""
+            ),
             "%Y%m%d_%H%M%S"
         )
 
         if segment_time <= target:
-            best_match = segment
+            best_match = {
+                "file": str(segment),
+                "timestamp": segment_time.strftime(
+                    "%Y%m%d_%H%M%S"
+                )
+            }
 
     return best_match
-
-
-if __name__ == "__main__":
-
-    test_time = input(
-        "Timestamp (YYYY-MM-DD HH:MM:SS): "
-    )
-
-    print(
-        find_segment_for_timestamp(
-            test_time
-        )
-    )

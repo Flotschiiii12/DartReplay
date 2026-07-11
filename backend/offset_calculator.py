@@ -3,10 +3,14 @@ from datetime import datetime
 from segment_matcher import find_segment_for_timestamp
 
 
-def calculate_offset(timestamp):
+def calculate_offset(
+    timestamp,
+    segment_directory
+):
 
     segment = find_segment_for_timestamp(
-        timestamp
+        timestamp,
+        segment_directory
     )
 
     if not segment:
@@ -40,6 +44,7 @@ if __name__ == "__main__":
 
     print(
         calculate_offset(
-            timestamp
+            timestamp,
+            "/opt/dartreplay/camera-segments-board"
         )
     )
