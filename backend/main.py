@@ -141,3 +141,26 @@ def get_stats():
             )
 
         return stats
+
+@app.get("/throws")
+def get_throws():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("SELECT * FROM throws ORDER BY id DESC LIMIT 100")
+        )
+
+        throws = []
+
+        for row in result:
+            throws.append(
+                {
+                    "id": row.id,
+                    "sector": row.sector,
+                    "x": row.x,
+                    "y": row.y,
+                    "bounceout": row.bounceout,
+                    "detection_time": row.detection_time
+                }
+            )
+
+        return throws
