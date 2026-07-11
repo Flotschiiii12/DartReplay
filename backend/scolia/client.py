@@ -23,6 +23,8 @@ async def main():
         f"&accessToken={ACCESS_TOKEN}"
     )
 
+    print(websocket_url)
+
     async with websockets.connect(websocket_url) as websocket:
         print("Verbunden!")
 
