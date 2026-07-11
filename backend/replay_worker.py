@@ -1,4 +1,5 @@
 import json
+import subprocess
 from pathlib import Path
 
 from sqlalchemy import text
@@ -45,10 +46,23 @@ with engine.connect() as connection:
 
         video_file = f"replay_{replay.id}.mp4"
 
-        open(
-            f"/opt/dartreplay/replays/{video_file}",
-            "a"
-        ).close()
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=c=black:s=1280x720:d=3",
+                "-c:v",
+                "libx264",
+                "-pix_fmt",
+                "yuv420p",
+                f"/opt/dartreplay/replays/{video_file}"
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
         output = {
             "replay_id": replay.id,
