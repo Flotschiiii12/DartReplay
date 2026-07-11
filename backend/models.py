@@ -19,3 +19,19 @@ class Match(Base):
     average = Column(Float)
     checkout_percentage = Column(Float)
     hundred_eighty_count = Column(Integer)
+
+from sqlalchemy import Boolean
+
+
+class Throw(Base):
+    __tablename__ = "throws"
+
+    id = Column(Integer, primary_key=True)
+
+    sector = Column(String)
+    x = Column(Integer)
+    y = Column(Integer)
+
+    bounceout = Column(Boolean)
+
+    detection_time = Column(String)
