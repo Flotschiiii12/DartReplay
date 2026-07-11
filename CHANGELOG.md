@@ -134,3 +134,11 @@
 - GET /throws implementiert
 - Echte SCOLIA-Würfe über FastAPI abrufbar
 - Wurfdaten erfolgreich aus PostgreSQL ausgelesen
+
+## v0.3.0
+
+### Highlight Foundation
+
+- GET /highlights implementiert
+- Erste Highlight-Erkennung erstellt
+- 180-Erkennung vorbereitet
