@@ -1,11 +1,11 @@
 import json
-import subprocess
 from pathlib import Path
 
 from sqlalchemy import text
 
 from database import engine
 from replay_metadata import get_highlight_metadata
+from replay_renderer import render_replay
 
 
 with engine.connect() as connection:
@@ -44,24 +44,8 @@ with engine.connect() as connection:
             exist_ok=True
         )
 
-        video_file = f"replay_{replay.id}.mp4"
-
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-f",
-                "lavfi",
-                "-i",
-                "color=c=black:s=1280x720:d=3",
-                "-c:v",
-                "libx264",
-                "-pix_fmt",
-                "yuv420p",
-                f"/opt/dartreplay/replays/{video_file}"
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+        video_file = render_replay(
+            replay.id
         )
 
         output = {
