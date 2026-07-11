@@ -1,0 +1,12 @@
+{
+    "replay_id": 7,
+    "trigger_id": 1,
+    "status": "COMPLETED",
+    "video_status": "NOT_CREATED",
+    "video_file": null,
+    "highlight": {
+        "trigger_id": 1,
+        "highlight_type": "180",
+        "created_at": "2026-07-11 14:42:26.834689+00"
+    }
+}
