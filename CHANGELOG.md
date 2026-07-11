@@ -104,3 +104,17 @@
 
 - Erweiterte Datenabfragen implementiert
 - Grundlage für SCOLIA-Import vorbereitet
+
+- ## v0.2.7
+
+### SCOLIA Integration Foundation
+
+- Throws-Tabelle erstellt
+- Datenmodell für Wurfdaten vorbereitet
+- SCOLIA-Ordnerstruktur erstellt
+- Erster WebSocket-Client implementiert
+- Authentifizierung über Serial Number und Access Token erfolgreich
+- Verbindung zum SCOLIA Board hergestellt
+- HELLO_CLIENT erfolgreich empfangen
+- Ersten echten THROW_DETECTED Event empfangen
+- Live-Kommunikation mit dem Board erfolgreich getestet
