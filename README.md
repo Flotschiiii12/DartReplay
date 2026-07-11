@@ -79,6 +79,30 @@ Architektur und Roadmap erstellt.
 - ✅ FastAPI erfolgreich mit PostgreSQL verbunden
 - ✅ Datenbankverbindung erfolgreich getestet
 
+## SCOLIA Integration
+
+✅ SCOLIA WebSocket Client erstellt
+
+✅ Verbindung zum SCOLIA Board erfolgreich hergestellt
+
+✅ Authentifizierung über Access Token erfolgreich
+
+✅ HELLO_CLIENT erfolgreich empfangen
+
+✅ Erste echte Wurfdaten (THROW_DETECTED) empfangen
+
+✅ Vorbereitung für automatische Wurfspeicherung abgeschlossen
+
+### Empfangene Live-Daten
+
+- Sektor (z. B. S14, T20, D16)
+- X/Y-Koordinaten
+- Horizontaler Winkel
+- Vertikaler Winkel
+- Bounceout-Status
+- Zeitstempel
+- Sektorvorschläge
+
 
 
 Replay every great moment.
