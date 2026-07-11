@@ -135,10 +135,18 @@
 - Echte SCOLIA-Würfe über FastAPI abrufbar
 - Wurfdaten erfolgreich aus PostgreSQL ausgelesen
 
-## v0.3.0
-
 ### Highlight Foundation
 
 - GET /highlights implementiert
 - Erste Highlight-Erkennung erstellt
 - 180-Erkennung vorbereitet
+- ## v3.0.0
+
+### Camera Integration
+
+- Tailscale Subnet Routing eingerichtet
+- Zugriff auf lokales Kameranetz ermöglicht
+- Reolink BoardCam angebunden
+- Reolink PlayerCam angebunden
+- RTSP-Streaming erfolgreich getestet
+- Erste Kamerabilder auf dem VPS gespeichert
