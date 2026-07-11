@@ -22,10 +22,10 @@
 
 ## Phase 2 – Datenintegration
 
-- [ ] API Zugang erhalten
-- [ ] Matchdaten speichern
-- [ ] Spielerstatistiken speichern
-- [ ] Historie erfassen
+- [x] API Zugang erhalten
+- [x] Matchdaten speichern
+- [x] Spielerstatistiken speichern
+- [x] Historie erfassen
 
 ---
 
