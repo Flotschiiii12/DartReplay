@@ -26,6 +26,11 @@
 - [x] Matchdaten speichern
 - [x] Spielerstatistiken speichern
 - [x] Historie erfassen
+- [ ] Highlight-Typen definieren
+- [ ] Highlights-Tabelle erstellen
+- [ ] Highlight API entwickeln
+- [ ] Highlight Detection Engine
+- [ ] SCOLIA Event Mapping
 
 ---
 
