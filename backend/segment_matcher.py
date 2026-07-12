@@ -37,3 +37,40 @@ def find_segment_for_timestamp(
             }
 
     return best_match
+
+
+def find_previous_segment(
+    timestamp,
+    segment_directory
+):
+
+    current = find_segment_for_timestamp(
+        timestamp,
+        segment_directory
+    )
+
+    if not current:
+        return None
+
+    segments = sorted(
+        Path(segment_directory).glob("*.mp4")
+    )
+
+    current_file = current["file"]
+
+    previous = None
+
+    for segment in segments:
+
+        if str(segment) == current_file:
+            return previous
+
+        previous = {
+            "file": str(segment),
+            "timestamp": segment.stem.replace(
+                "segment_",
+                ""
+            )
+        }
+
+    return None

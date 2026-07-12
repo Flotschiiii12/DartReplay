@@ -1,13 +1,10 @@
 import subprocess
 
 from timeline_video_builder import build_video_jobs
-from multicam_segment_matcher import get_segments
 from timeline_engine import get_latest_180_timeline
-from offset_calculator import calculate_offset
 
-
-BOARD_CORRECTION = 0
-PLAYER_CORRECTION = 0
+from buffer_file_matcher import find_buffer_file
+from buffer_offset_calculator import calculate_buffer_offset
 
 
 def execute_jobs():
@@ -40,71 +37,90 @@ def execute_jobs():
         elif event == "throw_2":
             ts = timeline["throw_2"].split(".")[0]
 
-        elif event == "pre_throw_3":
-            ts = timeline["throw_3"].split(".")[0]
-
         elif event == "throw_3":
             ts = timeline["throw_3"].split(".")[0]
 
         else:
             continue
 
-        segments = get_segments(ts)
+        if job["camera"] == "player":
 
-        if job["camera"] == "board":
-
-            source = segments["board"]["file"]
-
-            offset_data = calculate_offset(
+            match = find_buffer_file(
                 ts,
-                "/opt/dartreplay/camera-segments-board"
+                "player"
             )
 
-            offset = (
-                int(offset_data["offset"])
-                + BOARD_CORRECTION
-            )
+            if not match:
+                print("Kein Player-Buffer gefunden")
+                continue
 
-        else:
+            source = match["file"]
 
-            source = segments["player"]["file"]
-
-            offset_data = calculate_offset(
+            offset = calculate_buffer_offset(
                 ts,
-                "/opt/dartreplay/camera-segments-player"
+                match["timestamp"]
             )
 
             offset = max(
                 0,
-                int(offset_data["offset"])
-                - 3
-                + PLAYER_CORRECTION
+                offset - 3
+            )
+
+        else:
+
+            match = find_buffer_file(
+                ts,
+                "board"
+            )
+
+            if not match:
+                print("Kein Board-Buffer gefunden")
+                continue
+
+            source = match["file"]
+
+            offset = calculate_buffer_offset(
+                ts,
+                match["timestamp"]
+            )
+
+            offset = max(
+                0,
+                offset - 2
             )
 
         print(
             f"Render {event} "
-            f"({job['camera']}) "
-            f"Segment={source.split('/')[-1]} "
-            f"Offset={offset}s"
+            f"{job['camera']} "
+            f"{source} "
+            f"offset={offset}"
         )
 
         subprocess.run(
             [
                 "ffmpeg",
                 "-y",
-                "-i",
-                source,
                 "-ss",
                 str(offset),
+                "-i",
+                source,
                 "-t",
                 str(job["duration"]),
-                "-c",
-                "copy",
+                "-vf",
+                "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "23",
+                "-c:a",
+                "aac",
                 job["output"]
             ]
         )
 
-    print("✅ TV Timeline erstellt")
+    print("✅ Timeline erstellt")
 
 
 if __name__ == "__main__":

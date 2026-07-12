@@ -139,14 +139,8 @@ def execute_jobs():
                 str(offset),
                 "-t",
                 str(job["duration"]),
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",
-                "-crf",
-                "23",
-                "-c:a",
-                "aac",
+                "-c",
+                "copy",
                 job["output"]
             ]
         )

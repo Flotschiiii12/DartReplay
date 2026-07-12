@@ -4,12 +4,10 @@ from timeline_video_builder import build_video_jobs
 from multicam_segment_matcher import get_segments
 from timeline_engine import get_latest_180_timeline
 from offset_calculator import calculate_offset
-from segment_matcher import find_previous_segment
 
 
 BOARD_CORRECTION = 0
 PLAYER_CORRECTION = 0
-PLAYER_SEGMENT_DURATION = 60
 
 
 def execute_jobs():
@@ -69,58 +67,19 @@ def execute_jobs():
 
         else:
 
+            source = segments["player"]["file"]
+
             offset_data = calculate_offset(
                 ts,
                 "/opt/dartreplay/camera-segments-player"
             )
 
-            player_offset = int(
-                offset_data["offset"]
+            offset = max(
+                0,
+                int(offset_data["offset"])
+                - 3
+                + PLAYER_CORRECTION
             )
-
-            source = segments["player"]["file"]
-
-            if (
-                event.startswith("pre_throw")
-                and player_offset < 3
-            ):
-
-                previous_segment = find_previous_segment(
-                    ts,
-                    "/opt/dartreplay/camera-segments-player"
-                )
-
-                if previous_segment:
-
-                    source = previous_segment["file"]
-
-                    missing_seconds = (
-                        3 - player_offset
-                    )
-
-                    offset = (
-                        PLAYER_SEGMENT_DURATION
-                        - missing_seconds
-                    )
-
-                    print(
-                        f"Segmentwechsel erkannt: "
-                        f"{event} "
-                        f"nutzt vorheriges Segment"
-                    )
-
-                else:
-
-                    offset = 0
-
-            else:
-
-                offset = max(
-                    0,
-                    player_offset
-                    - 3
-                    + PLAYER_CORRECTION
-                )
 
         print(
             f"Render {event} "
@@ -139,14 +98,8 @@ def execute_jobs():
                 str(offset),
                 "-t",
                 str(job["duration"]),
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",
-                "-crf",
-                "23",
-                "-c:a",
-                "aac",
+                "-c",
+                "copy",
                 job["output"]
             ]
         )

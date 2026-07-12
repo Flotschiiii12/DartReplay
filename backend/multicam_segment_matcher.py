@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from segment_matcher import find_segment_for_timestamp
 
 
-PLAYER_SEGMENT_DELAY = 16
+PLAYER_SEGMENT_DELAY = 0
 
 
 def get_segments(timestamp):
