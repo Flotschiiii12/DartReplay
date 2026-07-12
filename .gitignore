@@ -25,3 +25,7 @@ PROJECT_STATUS.md
 # Local backup files
 *.working
 *.bak
+
+buffer/
+replays/
+temp/
