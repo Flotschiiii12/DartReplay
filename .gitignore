@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+.env
+
+# Runtime camera segments
+camera-segments/
+camera-segments-board/
+camera-segments-player/
+
+# Generated replays
+replays/
+
+# Temporary files
+temp/
+
+# Logs
+*.log
+
+# Archives
+*.zip
+
+# Local project notes
+PROJECT_STATUS.md
+
+# Local backup files
+*.working
+*.bak
