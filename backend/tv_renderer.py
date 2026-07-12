@@ -16,7 +16,8 @@ def build_render_plan():
             {
                 "source_camera": clip["camera"],
                 "duration": clip["duration"],
-                "event": clip["event"]
+                "event": clip["event"],
+                "timestamp": clip.get("timestamp")
             }
         )
 

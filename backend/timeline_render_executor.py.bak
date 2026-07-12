@@ -6,7 +6,7 @@ from timeline_engine import get_latest_180_timeline
 from offset_calculator import calculate_offset
 
 
-BOARD_CORRECTION = 0
+BOARD_CORRECTION = 5
 PLAYER_CORRECTION = 0
 
 

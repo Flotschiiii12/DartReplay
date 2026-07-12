@@ -1,26 +1,50 @@
 import subprocess
 
+from datetime import datetime
+
 from timeline_concat_builder import build_concat_file
 
 
-concat_file = build_concat_file()
+def render_tv_replay():
 
-output = (
-    "/opt/dartreplay/replays/tv_replay.mp4"
-)
+    concat_file = build_concat_file()
 
-subprocess.run([
-    "ffmpeg",
-    "-y",
-    "-f",
-    "concat",
-    "-safe",
-    "0",
-    "-i",
-    concat_file,
-    "-c",
-    "copy",
-    output
-])
+    timestamp = datetime.now().strftime(
+        "%Y%m%d_%H%M%S"
+    )
 
-print("✅ TV Replay erstellt")
+    output = (
+        f"/opt/dartreplay/replays/"
+        f"tv_replay_{timestamp}.mp4"
+    )
+
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            concat_file,
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "23",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "128k",
+            output
+        ]
+    )
+
+    print("✅ TV Replay erstellt")
+    print(output)
+
+
+if __name__ == "__main__":
+    render_tv_replay()

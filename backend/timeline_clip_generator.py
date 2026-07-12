@@ -19,7 +19,8 @@ def generate_clip_plan():
                 "clip_id": counter,
                 "camera": item["camera"],
                 "event": item["event"],
-                "duration": item["duration"]
+                "duration": item["duration"],
+                "timestamp": item.get("timestamp")
             }
         )
 

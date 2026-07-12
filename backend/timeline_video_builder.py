@@ -24,7 +24,8 @@ def build_video_jobs():
                 "output": output,
                 "camera": clip["source_camera"],
                 "event": clip["event"],
-                "duration": clip["duration"]
+                "duration": clip["duration"],
+                "timestamp": clip.get("timestamp")
             }
         )
 

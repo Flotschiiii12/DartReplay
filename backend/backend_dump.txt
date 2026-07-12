@@ -1,0 +1,1895 @@
+
+===== FILE: ./auto_highlight_replay.py =====
+from replay_window import get_latest_180_window
+from replay_renderer import render_replay
+
+
+def process_latest_highlight():
+
+    highlight = get_latest_180_window()
+
+    if not highlight:
+        print("Kein Highlight gefunden")
+        return
+
+    print("Highlight erkannt")
+    print(highlight)
+
+    render_replay(180)
+
+    print("✅ Replay erzeugt")
+
+
+if __name__ == "__main__":
+    process_latest_highlight()
+
+===== FILE: ./auto_replay.py =====
+import subprocess
+
+from segment_finder import get_latest_segment
+
+
+segment = get_latest_segment()
+
+if not segment:
+    print("Kein Segment gefunden")
+    exit()
+
+output = "/opt/dartreplay/replays/auto_replay.mp4"
+
+subprocess.run([
+    "ffmpeg",
+    "-y",
+    "-i",
+    segment,
+    "-ss",
+    "5",
+    "-t",
+    "15",
+    "-c",
+    "copy",
+    output
+])
+
+print("✅ Auto Replay erstellt")
+
+===== FILE: ./auto_timeline_concat_builder.py =====
+from pathlib import Path
+
+
+def build_concat_file():
+
+    clips = sorted(
+        Path("/opt/dartreplay/temp/timeline").glob(
+            "clip_*.mp4"
+        )
+    )
+
+    concat_file = (
+        "/opt/dartreplay/temp/timeline/auto_concat.txt"
+    )
+
+    with open(concat_file, "w") as file:
+
+        for clip in clips:
+
+            file.write(
+                f"file '{clip}'\n"
+            )
+
+    return concat_file
+
+
+if __name__ == "__main__":
+
+    print(
+        build_concat_file()
+    )
+
+===== FILE: ./auto_tv_renderer.py =====
+import subprocess
+
+from auto_timeline_concat_builder import (
+    build_concat_file
+)
+
+concat_file = build_concat_file()
+
+output = (
+    "/opt/dartreplay/replays/auto_tv_replay.mp4"
+)
+
+subprocess.run([
+    "ffmpeg",
+    "-y",
+    "-f",
+    "concat",
+    "-safe",
+    "0",
+    "-i",
+    concat_file,
+    "-c",
+    "copy",
+    output
+])
+
+print("✅ Auto TV Replay erstellt")
+
+===== FILE: ./camera_clip_extractor.py =====
+import subprocess
+
+from multicam_segment_matcher import get_segments
+
+
+def extract_clips(timestamp):
+
+    segments = get_segments(timestamp)
+
+    if not segments:
+        return None
+
+    board_clip = (
+        "/opt/dartreplay/temp/timeline/board_test.mp4"
+    )
+
+    player_clip = (
+        "/opt/dartreplay/temp/timeline/player_test.mp4"
+    )
+
+    subprocess.run([
+        "ffmpeg",
+        "-y",
+        "-i",
+        segments["board"]["file"],
+        "-ss",
+        "5",
+        "-t",
+        "5",
+        "-c",
+        "copy",
+        board_clip
+    ])
+
+    subprocess.run([
+        "ffmpeg",
+        "-y",
+        "-i",
+        segments["player"]["file"],
+        "-ss",
+        "5",
+        "-t",
+        "5",
+        "-c",
+        "copy",
+        player_clip
+    ])
+
+    return {
+        "board": board_clip,
+        "player": player_clip
+    }
+
+
+if __name__ == "__main__":
+
+    result = extract_clips(
+        "2026-07-11 20:40:00"
+    )
+
+    print(result)
+
+===== FILE: ./camera_recorder.py =====
+import subprocess
+
+RTSP_URL = "rtsp://admin:florian123!@192.168.2.179:554/h264Preview_01_main"
+
+subprocess.run(
+    [
+        "ffmpeg",
+        "-rtsp_transport",
+        "tcp",
+        "-i",
+        RTSP_URL,
+
+        "-f",
+        "segment",
+
+        "-segment_time",
+        "60",
+
+        "-reset_timestamps",
+        "1",
+
+        "-strftime",
+        "1",
+
+        "-c",
+        "copy",
+
+        "/opt/dartreplay/camera-segments/segment_%Y%m%d_%H%M%S.mp4"
+    ]
+)
+
+===== FILE: ./camera_recorder_board.py =====
+import subprocess
+
+RTSP_URL = "rtsp://admin:florian123!@192.168.2.179:554/h264Preview_01_main"
+
+subprocess.run([
+    "ffmpeg",
+    "-rtsp_transport",
+    "tcp",
+    "-i",
+    RTSP_URL,
+    "-c",
+    "copy",
+    "-f",
+    "segment",
+    "-segment_time",
+    "60",
+    "-strftime",
+    "1",
+    "/opt/dartreplay/camera-segments-board/segment_%Y%m%d_%H%M%S.mp4"
+])
+
+===== FILE: ./camera_recorder_player.py =====
+import subprocess
+
+RTSP_URL = "rtsp://admin:florian123!@192.168.2.178:554/h264Preview_01_main"
+
+subprocess.run([
+    "ffmpeg",
+    "-rtsp_transport",
+    "tcp",
+    "-i",
+    RTSP_URL,
+    "-c",
+    "copy",
+    "-f",
+    "segment",
+    "-segment_time",
+    "60",
+    "-strftime",
+    "1",
+    "/opt/dartreplay/camera-segments-player/segment_%Y%m%d_%H%M%S.mp4"
+])
+
+===== FILE: ./cleanup_segments.py =====
+from pathlib import Path
+
+SEGMENT_DIR = Path(
+    "/opt/dartreplay/camera-segments"
+)
+
+MAX_SEGMENTS = 30
+
+files = sorted(
+    SEGMENT_DIR.glob("*.mp4"),
+    key=lambda f: f.stat().st_mtime
+)
+
+while len(files) > MAX_SEGMENTS:
+
+    oldest = files.pop(0)
+
+    print(
+        f"Lösche: {oldest.name}"
+    )
+
+    oldest.unlink()
+
+print(
+    f"Aktuelle Segmente: {len(files)}"
+)
+
+===== FILE: ./clip_generator.py =====
+import subprocess
+
+SOURCE_FILE = "/opt/dartreplay/camera-segments/segment_20260711_193644.mp4"
+
+OUTPUT_FILE = "/opt/dartreplay/replays/manual_replay.mp4"
+
+subprocess.run(
+    [
+        "ffmpeg",
+        "-y",
+        "-i",
+        SOURCE_FILE,
+        "-ss",
+        "10",
+        "-t",
+        "15",
+        "-c",
+        "copy",
+        OUTPUT_FILE
+    ]
+)
+
+print("✅ Replay erstellt")
+
+===== FILE: ./create_tables.py =====
+from database import engine
+from models import Base
+
+Base.metadata.create_all(bind=engine)
+
+print("✅ Tabellen erstellt")
+
+===== FILE: ./database.py =====
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = "postgresql://dartreplay:dartreplay123@localhost:5432/dartreplay"
+
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+===== FILE: ./main.py =====
+
+from fastapi import FastAPI
+from sqlalchemy import text
+
+from database import engine
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class PlayerCreate(BaseModel):
+	name: str
+
+class MatchCreate(BaseModel):
+	player_id: int
+	average: float
+	checkout_percentage: float
+	hundred_eighty_count: int
+
+@app.get("/")
+def root():
+    return {"message": "Welcome to DartReplay"}
+
+
+@app.get("/players")
+def get_players():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("SELECT * FROM players")
+        )
+
+        players = []
+
+        for row in result:
+            players.append(
+                {
+                    "id": row.id,
+                    "name": row.name
+                }
+            )
+
+        return players
+
+@app.post("/players")
+def create_player(player: PlayerCreate):
+    with engine.connect() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO players (name) VALUES (:name)"
+            ),
+            {"name": player.name}
+        )
+
+        connection.commit()
+
+    return {
+        "message": "Player created",
+        "name": player.name
+    }
+
+
+
+@app.get("/matches")
+def get_matches():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("SELECT * FROM matches")
+        )
+
+        matches = []
+
+        for row in result:
+            matches.append(
+                {
+                    "id": row.id,
+                    "player_id": row.player_id,
+                    "average": row.average,
+                    "checkout_percentage": row.checkout_percentage,
+                    "hundred_eighty_count": row.hundred_eighty_count
+                }
+            )
+
+        return matches
+
+
+@app.post("/matches")
+def create_match(match: MatchCreate):
+    with engine.connect() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO matches (
+                    player_id,
+                    average,
+                    checkout_percentage,
+                    hundred_eighty_count
+                )
+                VALUES (
+                    :player_id,
+                    :average,
+                    :checkout_percentage,
+                    :hundred_eighty_count
+                )
+            """),
+            {
+                "player_id": match.player_id,
+                "average": match.average,
+                "checkout_percentage": match.checkout_percentage,
+                "hundred_eighty_count": match.hundred_eighty_count
+            }
+        )
+
+        connection.commit()
+
+    return {"message": "Match created"}
+
+@app.get("/stats")
+def get_stats():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("""
+                SELECT
+                    p.name,
+                    m.average,
+                    m.checkout_percentage,
+                    m.hundred_eighty_count
+                FROM matches m
+                JOIN players p
+                    ON p.id = m.player_id
+            """)
+        )
+
+        stats = []
+
+        for row in result:
+            stats.append(
+                {
+                    "player": row.name,
+                    "average": row.average,
+                    "checkout_percentage": row.checkout_percentage,
+                    "hundred_eighty_count": row.hundred_eighty_count
+                }
+            )
+
+        return stats
+
+@app.get("/throws")
+def get_throws():
+    with engine.connect() as connection:
+        result = connection.execute(
+            text("SELECT * FROM throws ORDER BY id DESC LIMIT 100")
+        )
+
+        throws = []
+
+        for row in result:
+            throws.append(
+                {
+                    "id": row.id,
+                    "sector": row.sector,
+                    "x": row.x,
+                    "y": row.y,
+                    "bounceout": row.bounceout,
+                    "detection_time": row.detection_time
+                }
+            )
+
+        return throws
+
+@app.get("/throw-stats")
+def get_throw_stats():
+    with engine.connect() as connection:
+
+        total = connection.execute(
+            text("SELECT COUNT(*) FROM throws")
+        ).scalar()
+
+        doubles = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE sector LIKE 'D%'"
+            )
+        ).scalar()
+
+        trebles = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE sector LIKE 'T%'"
+            )
+        ).scalar()
+
+        bounceouts = connection.execute(
+            text(
+                "SELECT COUNT(*) FROM throws WHERE bounceout = true"
+            )
+        ).scalar()
+
+        singles = total - doubles - trebles
+
+        return {
+            "total_throws": total,
+            "single_hits": singles,
+            "double_hits": doubles,
+            "treble_hits": trebles,
+            "bounceouts": bounceouts
+        }
+
+
+
+@app.get("/highlight-history")
+def get_highlight_history():
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM highlights
+                ORDER BY id DESC
+            """)
+        )
+
+        highlights = []
+
+        for row in result:
+            highlights.append(
+                {
+                    "id": row.id,
+                    "highlight_type": row.highlight_type,
+                    "created_at": row.created_at
+                }
+            )
+
+        return highlights
+
+@app.get("/replay-triggers")
+def get_replay_triggers():
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM replay_triggers
+                ORDER BY id DESC
+            """)
+        )
+
+        triggers = []
+
+        for row in result:
+            triggers.append(
+                {
+                    "id": row.id,
+                    "highlight_id": row.highlight_id,
+                    "trigger_type": row.trigger_type,
+                    "created_at": row.created_at
+                }
+            )
+
+        return triggers
+
+@app.get("/replay-queue")
+def get_replay_queue():
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM replay_queue
+                ORDER BY id DESC
+            """)
+        )
+
+        queue = []
+
+        for row in result:
+            queue.append(
+                {
+                    "id": row.id,
+                    "trigger_id": row.trigger_id,
+                    "status": row.status,
+                    "created_at": row.created_at
+                }
+            )
+
+        return queue
+
+@app.get("/highlights")
+def get_highlights():
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return {
+                "highlight_detected": False
+            }
+
+        sectors = [
+            throws[0].sector,
+            throws[1].sector,
+            throws[2].sector
+        ]
+
+        if sectors == ["T20", "T20", "T20"]:
+
+            result = connection.execute(
+                text("""
+                    INSERT INTO highlights
+                    (
+                        highlight_type,
+                        created_at
+                    )
+                    VALUES
+                    (
+                        '180',
+                        NOW()::text
+                    )
+                    RETURNING id
+                """)
+            )
+
+            highlight_id = result.fetchone()[0]
+
+            result = connection.execute(
+                text("""
+                    INSERT INTO replay_triggers
+                    (
+                        highlight_id,
+                        trigger_type,
+                        created_at
+                    )
+                    VALUES
+                    (
+                        :highlight_id,
+                        '180',
+                        NOW()::text
+                    )
+                    RETURNING id
+                """),
+                {"highlight_id": highlight_id}
+            )
+
+            trigger_id = result.fetchone()[0]
+
+            connection.execute(
+                text("""
+                    INSERT INTO replay_queue
+                    (
+                        trigger_id,
+                        status,
+                        created_at
+                    )
+                    VALUES
+                    (
+                        :trigger_id,
+                        'PENDING',
+                        NOW()::text
+                    )
+                """),
+                {"trigger_id": trigger_id}
+            )
+
+            connection.commit()
+
+            return {
+                "highlight_detected": True,
+                "type": "180"
+            }
+
+        return {
+            "highlight_detected": False
+        }
+
+from pathlib import Path
+
+
+@app.get("/replays")
+def get_replays():
+
+    replay_dir = Path(
+        "/opt/dartreplay/replays"
+    )
+
+    replays = []
+
+    for file in replay_dir.glob("*.json"):
+
+        with open(file, "r") as replay_file:
+
+            replays.append(
+                replay_file.read()
+            )
+
+    return replays
+
+===== FILE: ./models.py =====
+from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
+
+class Player(Base):
+    __tablename__ = "players"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+
+class Match(Base):
+    __tablename__ = "matches"
+
+    id = Column(Integer, primary_key=True)
+    player_id = Column(Integer, nullable=False)
+    average = Column(Float)
+    checkout_percentage = Column(Float)
+    hundred_eighty_count = Column(Integer)
+
+from sqlalchemy import Boolean
+
+
+class Throw(Base):
+    __tablename__ = "throws"
+
+    id = Column(Integer, primary_key=True)
+
+    sector = Column(String)
+    x = Column(Integer)
+    y = Column(Integer)
+
+    bounceout = Column(Boolean)
+
+    detection_time = Column(String)
+
+class Highlight(Base):
+    __tablename__ = "highlights"
+
+    id = Column(Integer, primary_key=True)
+
+    highlight_type = Column(String)
+
+    created_at = Column(String)
+
+class ReplayTrigger(Base):
+    __tablename__ = "replay_triggers"
+
+    id = Column(Integer, primary_key=True)
+
+    highlight_id = Column(Integer)
+
+    trigger_type = Column(String)
+
+    created_at = Column(String)
+
+class ReplayQueue(Base):
+    __tablename__ = "replay_queue"
+
+    id = Column(Integer, primary_key=True)
+
+    trigger_id = Column(Integer)
+
+    status = Column(String)
+
+    created_at = Column(String)
+
+===== FILE: ./multicam_renderer.py =====
+import subprocess
+
+from multicam_segment_matcher import get_segments
+
+timestamp = "2026-07-11 20:40:00"
+
+segments = get_segments(timestamp)
+
+board_output = "/opt/dartreplay/replays/board_clip.mp4"
+player_output = "/opt/dartreplay/replays/player_clip.mp4"
+
+subprocess.run([
+    "ffmpeg",
+    "-y",
+    "-i",
+    segments["board"]["file"],
+    "-ss",
+    "5",
+    "-t",
+    "20",
+    "-c",
+    "copy",
+    board_output
+])
+
+subprocess.run([
+    "ffmpeg",
+    "-y",
+    "-i",
+    segments["player"]["file"],
+    "-ss",
+    "5",
+    "-t",
+    "20",
+    "-c",
+    "copy",
+    player_output
+])
+
+print("✅ Board Clip erstellt")
+print("✅ Player Clip erstellt")
+
+===== FILE: ./multicam_segment_matcher.py =====
+from segment_matcher import find_segment_for_timestamp
+
+
+def get_segments(timestamp):
+
+    board = find_segment_for_timestamp(
+        timestamp,
+        "/opt/dartreplay/camera-segments-board"
+    )
+
+    player = find_segment_for_timestamp(
+        timestamp,
+        "/opt/dartreplay/camera-segments-player"
+    )
+
+    return {
+        "board": board,
+        "player": player
+    }
+
+
+if __name__ == "__main__":
+
+    timestamp = input(
+        "Timestamp: "
+    )
+
+    print(
+        get_segments(timestamp)
+    )
+
+===== FILE: ./offset_calculator.py =====
+from datetime import datetime
+
+from segment_matcher import find_segment_for_timestamp
+
+
+def calculate_offset(
+    timestamp,
+    segment_directory
+):
+
+    segment = find_segment_for_timestamp(
+        timestamp,
+        segment_directory
+    )
+
+    if not segment:
+        return None
+
+    segment_time = datetime.strptime(
+        segment["timestamp"],
+        "%Y%m%d_%H%M%S"
+    )
+
+    target_time = datetime.strptime(
+        timestamp,
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    offset = (
+        target_time - segment_time
+    ).total_seconds()
+
+    return {
+        "segment": segment["file"],
+        "offset": offset
+    }
+
+
+if __name__ == "__main__":
+
+    timestamp = input(
+        "Timestamp (YYYY-MM-DD HH:MM:SS): "
+    )
+
+    print(
+        calculate_offset(
+            timestamp,
+            "/opt/dartreplay/camera-segments-board"
+        )
+    )
+
+===== FILE: ./precise_replay_renderer.py =====
+import subprocess
+
+from offset_calculator import calculate_offset
+from timeline_renderer import get_replay_duration
+
+
+def render_precise_replay(
+    replay_id,
+    timestamp
+):
+
+    data = calculate_offset(
+        timestamp
+    )
+
+    if not data:
+        print("Kein Segment gefunden")
+        return None
+
+    duration = get_replay_duration()
+
+    if not duration:
+        duration = 25
+
+    output = (
+        f"/opt/dartreplay/replays/precise_{replay_id}.mp4"
+    )
+
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            data["segment"],
+            "-ss",
+            str(max(0, int(data["offset"]) - 15)),
+            "-t",
+            str(duration),
+            "-c",
+            "copy",
+            output
+        ]
+    )
+
+    print(f"✅ {output}")
+
+    return output
+
+
+if __name__ == "__main__":
+
+    render_precise_replay(
+        999,
+        "2026-07-11 19:38:40"
+    )
+
+===== FILE: ./replay_metadata.py =====
+from sqlalchemy import text
+
+from database import engine
+
+
+def get_highlight_metadata(trigger_id):
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT
+                    rt.id AS trigger_id,
+                    h.highlight_type,
+                    h.created_at
+                FROM replay_triggers rt
+                JOIN highlights h
+                    ON h.id = rt.highlight_id
+                WHERE rt.id = :trigger_id
+            """),
+            {"trigger_id": trigger_id}
+        )
+
+        row = result.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            "trigger_id": row.trigger_id,
+            "highlight_type": row.highlight_type,
+            "created_at": row.created_at
+        }
+
+===== FILE: ./replay_renderer.py =====
+import subprocess
+
+from segment_finder import get_latest_segment
+
+
+def render_replay(replay_id):
+
+    segment = get_latest_segment()
+
+    if not segment:
+        print("Kein Segment gefunden")
+        return None
+
+    output = (
+        f"/opt/dartreplay/replays/replay_{replay_id}.mp4"
+    )
+
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            segment,
+            "-ss",
+            "5",
+            "-t",
+            "15",
+            "-c",
+            "copy",
+            output
+        ]
+    )
+
+    return output
+
+
+if __name__ == "__main__":
+    print(
+        render_replay(999)
+    )
+
+===== FILE: ./replay_timeline_builder.py =====
+from timeline_engine import get_latest_180_timeline
+
+
+def build_timeline():
+
+    timeline_data = get_latest_180_timeline()
+
+    if not timeline_data:
+        return None
+
+    delta_1 = timeline_data["delta_1"]
+    delta_2 = timeline_data["delta_2"]
+
+    return [
+        {
+            "camera": "player",
+            "event": "pre_throw_1",
+            "duration": max(2, delta_1)
+        },
+
+        {
+            "camera": "board",
+            "event": "throw_1",
+            "timestamp": timeline_data["throw_1"],
+            "duration": 2
+        },
+
+        {
+            "camera": "player",
+            "event": "pre_throw_2",
+            "duration": max(2, delta_2)
+        },
+
+        {
+            "camera": "board",
+            "event": "throw_2",
+            "timestamp": timeline_data["throw_2"],
+            "duration": 2
+        },
+
+        {
+            "camera": "player",
+            "event": "pre_throw_3",
+            "duration": 3
+        },
+
+        {
+            "camera": "board",
+            "event": "throw_3",
+            "timestamp": timeline_data["throw_3"],
+            "duration": 4
+        },
+
+        {
+            "camera": "player",
+            "event": "reaction",
+            "duration": 8
+        }
+    ]
+
+
+if __name__ == "__main__":
+    print(build_timeline())
+
+===== FILE: ./replay_window.py =====
+from sqlalchemy import text
+
+from database import engine
+
+
+def get_latest_180_window():
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return None
+
+        sectors = [
+            throws[0].sector,
+            throws[1].sector,
+            throws[2].sector
+        ]
+
+        if sectors != ["T20", "T20", "T20"]:
+            return None
+
+        return {
+            "first_throw_time": throws[2].detection_time,
+            "last_throw_time": throws[0].detection_time
+        }
+
+
+if __name__ == "__main__":
+    print(
+        get_latest_180_window()
+    )
+
+===== FILE: ./replay_worker.py =====
+import json
+from pathlib import Path
+
+from sqlalchemy import text
+
+from database import engine
+from replay_metadata import get_highlight_metadata
+from replay_renderer import render_replay
+
+
+with engine.connect() as connection:
+
+    result = connection.execute(
+        text("""
+            SELECT *
+            FROM replay_queue
+            WHERE status = 'PENDING'
+            ORDER BY id ASC
+            LIMIT 1
+        """)
+    )
+
+    replay = result.fetchone()
+
+    if replay:
+
+        connection.execute(
+            text("""
+                UPDATE replay_queue
+                SET status = 'PROCESSING'
+                WHERE id = :id
+            """),
+            {"id": replay.id}
+        )
+
+        connection.commit()
+
+        metadata = get_highlight_metadata(
+            replay.trigger_id
+        )
+
+        Path("/opt/dartreplay/replays").mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        video_file = render_replay(
+            replay.id
+        )
+
+        output = {
+            "replay_id": replay.id,
+            "trigger_id": replay.trigger_id,
+            "status": "COMPLETED",
+            "video_status": "CREATED",
+            "video_file": video_file,
+            "highlight": metadata
+        }
+
+        with open(
+            f"/opt/dartreplay/replays/replay_{replay.id}.json",
+            "w"
+        ) as file:
+            json.dump(
+                output,
+                file,
+                indent=4,
+                default=str
+            )
+
+        connection.execute(
+            text("""
+                UPDATE replay_queue
+                SET status = 'COMPLETED'
+                WHERE id = :id
+            """),
+            {"id": replay.id}
+        )
+
+        connection.commit()
+
+        print(
+            f"✅ Replay {replay.id} abgeschlossen"
+        )
+
+    else:
+        print("Keine offenen Replays")
+
+===== FILE: ./ringbuffer_manager.py =====
+import time
+import subprocess
+
+while True:
+
+    subprocess.run(
+        [
+            "python3",
+            "/opt/dartreplay/backend/cleanup_segments.py"
+        ]
+    )
+
+    time.sleep(60)
+
+===== FILE: ./scolia/client.py =====
+
+import asyncio
+import json
+import websockets
+import psycopg2
+
+from config import SERIAL_NUMBER, ACCESS_TOKEN
+
+
+async def main():
+    connection = psycopg2.connect(
+        host="localhost",
+        database="dartreplay",
+        user="dartreplay",
+        password="dartreplay123"
+    )
+
+    cursor = connection.cursor()
+
+    websocket_url = (
+        f"wss://game.scoliadarts.com/api/v1/social"
+        f"?serialNumber={SERIAL_NUMBER}"
+        f"&accessToken={ACCESS_TOKEN}"
+    )
+
+    print(websocket_url)
+
+    async with websockets.connect(websocket_url) as websocket:
+        print("Verbunden!")
+
+        while True:
+            message = await websocket.recv()
+
+            data = json.loads(message)
+
+            print(data)
+
+            if data["type"] == "THROW_DETECTED":
+
+                payload = data["payload"]
+
+                cursor.execute(
+                    """
+                    INSERT INTO throws
+                    (
+                        sector,
+                        x,
+                        y,
+                        bounceout,
+                        detection_time
+                    )
+                    VALUES
+                    (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    )
+                    """,
+                    (
+                        payload["sector"],
+                        payload["coordinates"][0],
+                        payload["coordinates"][1],
+                        payload["bounceout"],
+                        payload["detectionTime"]
+                    )
+                )
+
+                connection.commit()
+
+                print("✅ Wurf gespeichert")
+
+
+asyncio.run(main())
+
+===== FILE: ./scolia/config.py =====
+SERIAL_NUMBER = "THBZ-J46C-UJRR"
+
+ACCESS_TOKEN = "f692ea07673f25a1c3b95a498caa8e15"
+
+===== FILE: ./segment_finder.py =====
+from pathlib import Path
+
+
+def get_latest_segment():
+
+    segment_dir = Path(
+        "/opt/dartreplay/camera-segments"
+    )
+
+    segments = sorted(
+        segment_dir.glob("*.mp4")
+    )
+
+    if not segments:
+        return None
+
+    return str(segments[-1])
+
+
+if __name__ == "__main__":
+
+    print(
+        get_latest_segment()
+    )
+
+===== FILE: ./segment_index.py =====
+from pathlib import Path
+
+
+def get_segments():
+
+    segment_dir = Path(
+        "/opt/dartreplay/camera-segments"
+    )
+
+    segments = sorted(
+        segment_dir.glob("*.mp4")
+    )
+
+    result = []
+
+    for segment in segments:
+
+        name = segment.stem.replace(
+            "segment_",
+            ""
+        )
+
+        result.append(
+            {
+                "file": str(segment),
+                "timestamp": name
+            }
+        )
+
+    return result
+
+
+if __name__ == "__main__":
+
+    for segment in get_segments():
+        print(segment)
+
+===== FILE: ./segment_matcher.py =====
+from datetime import datetime
+from pathlib import Path
+
+
+def find_segment_for_timestamp(
+    timestamp,
+    segment_directory
+):
+
+    target = datetime.strptime(
+        timestamp,
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    segments = sorted(
+        Path(segment_directory).glob("*.mp4")
+    )
+
+    best_match = None
+
+    for segment in segments:
+
+        segment_time = datetime.strptime(
+            segment.stem.replace(
+                "segment_",
+                ""
+            ),
+            "%Y%m%d_%H%M%S"
+        )
+
+        if segment_time <= target:
+            best_match = {
+                "file": str(segment),
+                "timestamp": segment_time.strftime(
+                    "%Y%m%d_%H%M%S"
+                )
+            }
+
+    return best_match
+
+===== FILE: ./smart_replay.py =====
+from replay_window import get_latest_180_window
+from replay_renderer import render_replay
+
+
+def create_latest_180_replay():
+
+    window = get_latest_180_window()
+
+    if not window:
+        print("Kein 180 erkannt")
+        return
+
+    print("180 erkannt")
+    print(window)
+
+    render_replay(180)
+
+    print("✅ Replay erstellt")
+
+
+if __name__ == "__main__":
+    create_latest_180_replay()
+
+===== FILE: ./test_db.py =====
+from database import engine
+
+with engine.connect() as connection:
+    print("✅ Datenbankverbindung erfolgreich")
+
+===== FILE: ./throw_timeline.py =====
+from sqlalchemy import text
+
+from database import engine
+
+
+def get_latest_highlight_window():
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return None
+
+        return {
+            "first_throw": throws[2].detection_time,
+            "last_throw": throws[0].detection_time
+        }
+
+
+if __name__ == "__main__":
+    print(
+        get_latest_highlight_window()
+    )
+
+===== FILE: ./timeline_clip_generator.py =====
+from replay_timeline_builder import build_timeline
+
+
+def generate_clip_plan():
+
+    timeline = build_timeline()
+
+    if not timeline:
+        return None
+
+    clips = []
+
+    counter = 1
+
+    for item in timeline:
+
+        clips.append(
+            {
+                "clip_id": counter,
+                "camera": item["camera"],
+                "event": item["event"],
+                "duration": item["duration"]
+            }
+        )
+
+        counter += 1
+
+    return clips
+
+
+if __name__ == "__main__":
+
+    clip_plan = generate_clip_plan()
+
+    for clip in clip_plan:
+        print(clip)
+
+===== FILE: ./timeline_concat_builder.py =====
+from pathlib import Path
+
+
+def build_concat_file():
+
+    clips = sorted(
+        Path(
+            "/opt/dartreplay/temp/timeline"
+        ).glob("clip_*.mp4")
+    )
+
+    output = (
+        "/opt/dartreplay/temp/timeline/concat.txt"
+    )
+
+    with open(output, "w") as file:
+
+        for clip in clips:
+
+            file.write(
+                f"file '{clip}'\n"
+            )
+
+    return output
+
+
+if __name__ == "__main__":
+
+    print(
+        build_concat_file()
+    )
+
+===== FILE: ./timeline_concat_renderer.py =====
+import subprocess
+
+from timeline_concat_builder import build_concat_file
+
+
+concat_file = build_concat_file()
+
+output = (
+    "/opt/dartreplay/replays/tv_replay.mp4"
+)
+
+subprocess.run([
+    "ffmpeg",
+    "-y",
+    "-f",
+    "concat",
+    "-safe",
+    "0",
+    "-i",
+    concat_file,
+    "-c",
+    "copy",
+    output
+])
+
+print("✅ TV Replay erstellt")
+
+===== FILE: ./timeline_engine.py =====
+from datetime import datetime, timedelta
+from sqlalchemy import text
+from database import engine
+
+
+def parse_time(value):
+    value = str(value)
+    value = value.split("+")[0].strip()
+
+    if "." in value:
+        value = value[:26]
+
+    parsed = datetime.strptime(
+        value,
+        "%Y-%m-%d %H:%M:%S.%f"
+    )
+
+    return parsed + timedelta(hours=2)
+
+
+def get_latest_180_timeline():
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return None
+
+        throw_1 = parse_time(throws[2].detection_time)
+        throw_2 = parse_time(throws[1].detection_time)
+        throw_3 = parse_time(throws[0].detection_time)
+
+        delta_1 = (throw_2 - throw_1).total_seconds()
+        delta_2 = (throw_3 - throw_2).total_seconds()
+        visit_duration = (throw_3 - throw_1).total_seconds()
+
+        return {
+            "throw_1": str(throw_1),
+            "throw_2": str(throw_2),
+            "throw_3": str(throw_3),
+            "sector_1": throws[2].sector,
+            "sector_2": throws[1].sector,
+            "sector_3": throws[0].sector,
+            "delta_1": delta_1,
+            "delta_2": delta_2,
+            "visit_duration": visit_duration,
+            "clip_start": str(
+                throw_1 - timedelta(seconds=15)
+            ),
+            "clip_end": str(
+                throw_3 + timedelta(seconds=10)
+            )
+        }
+
+
+def get_latest_180_throws():
+
+    with engine.connect() as connection:
+
+        result = connection.execute(
+            text("""
+                SELECT *
+                FROM throws
+                ORDER BY id DESC
+                LIMIT 3
+            """)
+        )
+
+        throws = list(result)
+
+        if len(throws) < 3:
+            return None
+
+        return {
+            "throw_1": str(parse_time(throws[2].detection_time)),
+            "throw_2": str(parse_time(throws[1].detection_time)),
+            "throw_3": str(parse_time(throws[0].detection_time)),
+            "sector_1": throws[2].sector,
+            "sector_2": throws[1].sector,
+            "sector_3": throws[0].sector
+        }
+
+
+if __name__ == "__main__":
+    print(get_latest_180_timeline())
+
+===== FILE: ./timeline_render_executor.py =====
+import subprocess
+
+from timeline_video_builder import build_video_jobs
+from multicam_segment_matcher import get_segments
+from timeline_engine import get_latest_180_timeline
+
+
+def execute_jobs():
+
+    timeline = get_latest_180_timeline()
+
+    if not timeline:
+        print("Keine Timeline gefunden")
+        return
+
+    timestamp = timeline["throw_1"].split(".")[0]
+
+    jobs = build_video_jobs()
+
+    if not jobs:
+        print("Keine Jobs gefunden")
+        return
+
+    segments = get_segments(timestamp)
+
+    if not segments:
+        print("Keine Segmente gefunden")
+        return
+
+    for job in jobs:
+
+        source = (
+            segments["player"]["file"]
+            if job["camera"] == "player"
+            else segments["board"]["file"]
+        )
+
+        print(
+            f"Render {job['camera']} -> {job['output']}"
+        )
+
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                source,
+                "-ss",
+                "5",
+                "-t",
+                str(job["duration"]),
+                "-c",
+                "copy",
+                job["output"]
+            ]
+        )
+
+    print("✅ Timeline Clips erstellt")
+
+
+if __name__ == "__main__":
+    execute_jobs()
+
+===== FILE: ./timeline_renderer.py =====
+from datetime import datetime
+
+from timeline_engine import get_latest_180_timeline
+
+
+def get_replay_duration():
+
+    timeline = get_latest_180_timeline()
+
+    if not timeline:
+        return None
+
+    start = datetime.strptime(
+        timeline["clip_start"],
+        "%Y-%m-%d %H:%M:%S.%f"
+    )
+
+    end = datetime.strptime(
+        timeline["clip_end"],
+        "%Y-%m-%d %H:%M:%S.%f"
+    )
+
+    return int(
+        (end - start).total_seconds()
+    )
+
+
+if __name__ == "__main__":
+    print(
+        get_replay_duration()
+    )
+
+===== FILE: ./timeline_video_builder.py =====
+from pathlib import Path
+
+from tv_renderer import build_render_plan
+
+
+def build_video_jobs():
+
+    plan = build_render_plan()
+
+    if not plan:
+        return None
+
+    jobs = []
+
+    for index, clip in enumerate(plan, start=1):
+
+        output = (
+            f"/opt/dartreplay/temp/timeline/"
+            f"clip_{index:03d}.mp4"
+        )
+
+        jobs.append(
+            {
+                "output": output,
+                "camera": clip["source_camera"],
+                "event": clip["event"],
+                "duration": clip["duration"]
+            }
+        )
+
+    return jobs
+
+
+if __name__ == "__main__":
+
+    jobs = build_video_jobs()
+
+    for job in jobs:
+        print(job)
+
+===== FILE: ./tv_renderer.py =====
+from timeline_clip_generator import generate_clip_plan
+
+
+def build_render_plan():
+
+    clips = generate_clip_plan()
+
+    if not clips:
+        return None
+
+    render_plan = []
+
+    for clip in clips:
+
+        render_plan.append(
+            {
+                "source_camera": clip["camera"],
+                "duration": clip["duration"],
+                "event": clip["event"]
+            }
+        )
+
+    return render_plan
+
+
+if __name__ == "__main__":
+
+    plan = build_render_plan()
+
+    for step in plan:
+        print(step)
