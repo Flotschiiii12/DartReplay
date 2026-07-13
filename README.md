@@ -17,11 +17,16 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 
 ### 🎬 Replay Engine
 
-- Automatische Highlight-Erkennung
-- Replay-Erstellung
-- Zwei-Kamera-System
-- Ringpuffer-System
-- FFmpeg Video Processing
+* Automatische Replay-Erstellung über SCOLIA-Daten
+* Zwei-Kamera-System (Player + Board)
+* Ringbuffer-Aufzeichnung
+* Automatische Clip-Erstellung
+* Timeline-basierte Replay-Regie
+* TV-Style Dart-Replays
+* FFmpeg Rendering Pipeline
+* Mainstream-Unterstützung
+* Automatische Synchronisation zwischen Spieler- und Boardkamera
+`
 
 ### 🤖 Integrationen
 
