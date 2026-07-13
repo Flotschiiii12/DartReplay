@@ -150,3 +150,25 @@
 - Reolink PlayerCam angebunden
 - RTSP-Streaming erfolgreich getestet
 - Erste Kamerabilder auf dem VPS gespeichert
+
+- # v0.4 Mainstream Replay Milestone
+
+## Replay Engine
+
+- Replay-Synchronisation verbessert
+- Player-/Board-Schnitt optimiert
+- Timeline-Rendering stabilisiert
+- Fehlerhafte Buffer-Zuordnung behoben
+- Unterstützung für 60-Sekunden-Buffersegmente implementiert
+
+## Recording
+
+- Mainstream-Kameras integriert
+- Aufnahme direkt auf 1280x720 normalisiert
+- Gültige MP4-Erstellung stabilisiert
+- Fehler bei Segmentwechseln behoben
+
+## Replay Quality
+
+- Deutlich bessere Bildqualität gegenüber Substream
+- 30 FPS Mainstream-Pipeline aktiviert
