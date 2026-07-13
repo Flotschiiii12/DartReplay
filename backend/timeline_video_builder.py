@@ -1,11 +1,9 @@
-from pathlib import Path
-
 from tv_renderer import build_render_plan
 
 
-def build_video_jobs():
+def build_video_jobs(timeline_data):
 
-    plan = build_render_plan()
+    plan = build_render_plan(timeline_data)
 
     if not plan:
         return None
@@ -30,11 +28,3 @@ def build_video_jobs():
         )
 
     return jobs
-
-
-if __name__ == "__main__":
-
-    jobs = build_video_jobs()
-
-    for job in jobs:
-        print(job)

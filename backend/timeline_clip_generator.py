@@ -1,9 +1,9 @@
 from replay_timeline_builder import build_timeline
 
 
-def generate_clip_plan():
+def generate_clip_plan(timeline_data):
 
-    timeline = build_timeline()
+    timeline = build_timeline(timeline_data)
 
     if not timeline:
         return None
@@ -27,11 +27,3 @@ def generate_clip_plan():
         counter += 1
 
     return clips
-
-
-if __name__ == "__main__":
-
-    clip_plan = generate_clip_plan()
-
-    for clip in clip_plan:
-        print(clip)

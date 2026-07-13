@@ -18,6 +18,9 @@ def find_buffer_file(
         )
     )
 
+    if len(files) > 1:
+        files = files[:-1]
+
     best_match = None
 
     for file in files:
@@ -35,7 +38,11 @@ def find_buffer_file(
         except Exception:
             continue
 
-        if file_time <= target:
+        from datetime import timedelta
+
+        file_end = file_time + timedelta(seconds=60)
+
+        if file_time <= target < file_end:
 
             best_match = {
                 "file": str(file),

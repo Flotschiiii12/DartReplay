@@ -1,8 +1,11 @@
+import json
 import time
-import subprocess
 from pathlib import Path
+from datetime import datetime
 
 from timeline_engine import get_latest_180_timeline
+
+QUEUE_DIR = Path("/opt/dartreplay/replay_queue")
 
 last_throw = None
 
@@ -12,49 +15,34 @@ while True:
 
         timeline = get_latest_180_timeline()
 
-        if timeline:
+        if not timeline:
+            time.sleep(2)
+            continue
 
-            current_throw = timeline["throw_3"]
+        current_throw = timeline["throw_3"]
 
-            if current_throw != last_throw:
+        if current_throw == last_throw:
+            time.sleep(2)
+            continue
 
-                last_throw = current_throw
+        last_throw = current_throw
 
-                print("🎯 Neuer Visit erkannt")
+        queue_file = QUEUE_DIR / (
+            datetime.now().strftime(
+                "%Y%m%d_%H%M%S.json"
+            )
+        )
 
-                print("⏳ Warte 70 Sekunden auf fertige Segmente...")
-                time.sleep(70)
+        with open(queue_file, "w") as f:
+            json.dump(
+                timeline,
+                f,
+                indent=4
+            )
 
-                for file in Path(
-                    "/opt/dartreplay/temp/timeline"
-                ).glob("clip_*.mp4"):
-                    file.unlink(missing_ok=True)
-
-                concat_file = Path(
-                    "/opt/dartreplay/temp/timeline/concat.txt"
-                )
-
-                concat_file.unlink(
-                    missing_ok=True
-                )
-
-                subprocess.run(
-                    [
-                        "python3",
-                        "/opt/dartreplay/backend/timeline_render_executor.py"
-                    ]
-                )
-
-                subprocess.run(
-                    [
-                        "python3",
-                        "/opt/dartreplay/backend/timeline_concat_renderer.py"
-                    ]
-                )
-
-                print("✅ Replay erstellt")
+        print(f"✅ Queue gespeichert: {queue_file}")
 
     except Exception as e:
         print(e)
 
-    time.sleep(5)
+    time.sleep(2)

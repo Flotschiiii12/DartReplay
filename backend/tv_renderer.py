@@ -1,9 +1,9 @@
 from timeline_clip_generator import generate_clip_plan
 
 
-def build_render_plan():
+def build_render_plan(timeline_data):
 
-    clips = generate_clip_plan()
+    clips = generate_clip_plan(timeline_data)
 
     if not clips:
         return None
@@ -22,11 +22,3 @@ def build_render_plan():
         )
 
     return render_plan
-
-
-if __name__ == "__main__":
-
-    plan = build_render_plan()
-
-    for step in plan:
-        print(step)

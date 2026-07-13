@@ -1,21 +1,32 @@
+import json
+import sys
 import subprocess
 
 from timeline_video_builder import build_video_jobs
-from timeline_engine import get_latest_180_timeline
 
 from buffer_file_matcher import find_buffer_file
 from buffer_offset_calculator import calculate_buffer_offset
 
 
+def load_timeline():
+
+    if len(sys.argv) > 1:
+
+        with open(sys.argv[1], "r") as f:
+            return json.load(f)
+
+    return None
+
+
 def execute_jobs():
 
-    timeline = get_latest_180_timeline()
+    timeline = load_timeline()
 
     if not timeline:
         print("Keine Timeline gefunden")
         return
 
-    jobs = build_video_jobs()
+    jobs = build_video_jobs(timeline)
 
     if not jobs:
         print("Keine Jobs gefunden")
@@ -63,7 +74,7 @@ def execute_jobs():
 
             offset = max(
                 0,
-                offset - 3
+                offset + 3.0
             )
 
         else:
@@ -86,7 +97,7 @@ def execute_jobs():
 
             offset = max(
                 0,
-                offset - 2
+                offset - 0.5
             )
 
         print(
@@ -108,6 +119,8 @@ def execute_jobs():
                 str(job["duration"]),
                 "-vf",
                 "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
+                "-r",
+                "30",
                 "-c:v",
                 "libx264",
                 "-preset",

@@ -1,9 +1,4 @@
-from timeline_engine import get_latest_180_timeline
-
-
-def build_timeline():
-
-    timeline_data = get_latest_180_timeline()
+def build_timeline(timeline_data):
 
     if not timeline_data:
         return None
@@ -14,46 +9,42 @@ def build_timeline():
             "camera": "player",
             "event": "throw_1",
             "timestamp": timeline_data["throw_1"],
-            "duration": 3
+            "duration": 1.0
         },
 
         {
             "camera": "board",
             "event": "throw_1",
             "timestamp": timeline_data["throw_1"],
-            "duration": 2
+            "duration": 3.0
         },
 
         {
             "camera": "player",
             "event": "throw_2",
             "timestamp": timeline_data["throw_2"],
-            "duration": 3
+            "duration": 1.0
         },
 
         {
             "camera": "board",
             "event": "throw_2",
             "timestamp": timeline_data["throw_2"],
-            "duration": 2
+            "duration": 3.0
         },
 
         {
             "camera": "player",
             "event": "throw_3",
             "timestamp": timeline_data["throw_3"],
-            "duration": 3
+            "duration": 1.0
         },
 
         {
             "camera": "board",
             "event": "throw_3",
             "timestamp": timeline_data["throw_3"],
-            "duration": 3
+            "duration": 3.0
         }
 
     ]
-
-
-if __name__ == "__main__":
-    print(build_timeline())
