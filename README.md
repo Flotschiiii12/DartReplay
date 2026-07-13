@@ -1,12 +1,46 @@
 # 🎯 DartReplay 🎯
 
-Replay every great moment.
+**Replay every great moment.**
 
-DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennung von Highlights und Erstellung professioneller Replay-Videos.
+DartReplay ist eine Plattform zur automatischen Erstellung von Dart-Replays, Highlight-Erkennung und zukünftigen statistischen Auswertungen.
 
-## Features
+Der aktuelle Fokus liegt auf einer professionellen Replay-Engine mit automatischer Wurferkennung über SCOLIA und einer TV-ähnlichen Videoregie.
 
-### 📊 Analytics
+---
+
+# 🚀 Features
+
+## 🎬 Replay Engine
+
+### Bereits umgesetzt
+
+- ✅ Automatische Replay-Erstellung
+- ✅ SCOLIA-basierte Wurferkennung
+- ✅ Zwei-Kamera-System (Player + Board)
+- ✅ Ringbuffer-Aufzeichnung
+- ✅ Segmentierte Videoaufnahme
+- ✅ Mainstream-Kameraunterstützung
+- ✅ Timeline-basierte Replay-Regie
+- ✅ Automatische Clip-Erstellung
+- ✅ TV-Style Replay-Ausgabe
+- ✅ FFmpeg Rendering Pipeline
+- ✅ Buffer-Matching System
+- ✅ Automatische Kameraumschaltung
+- ✅ Mainstream Replay Pipeline
+- ✅ 1280x720 Replay-Aufzeichnung
+
+### Geplante Erweiterungen
+
+- ⏳ Celebration-Cam
+- ⏳ Slow Motion Replays
+- ⏳ Erweiterte Kameraregie
+- ⏳ Highlight-Zusammenschnitte
+
+---
+
+## 📊 Analytics
+
+### Geplant
 
 - Average
 - First 9 Average
@@ -14,32 +48,40 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 - High Finishes
 - Matchhistorie
 - Rekorde
+- Spielerstatistiken
 
-### 🎬 Replay Engine
+### Aktueller Hinweis
 
-* Automatische Replay-Erstellung über SCOLIA-Daten
-* Zwei-Kamera-System (Player + Board)
-* Ringbuffer-Aufzeichnung
-* Automatische Clip-Erstellung
-* Timeline-basierte Replay-Regie
-* TV-Style Dart-Replays
-* FFmpeg Rendering Pipeline
-* Mainstream-Unterstützung
-* Automatische Synchronisation zwischen Spieler- und Boardkamera
-`
+SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
 
-### 🤖 Integrationen
+Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und Statistikauswertung benötigt.
+
+---
+
+## 🤖 Integrationen
+
+### Geplant
 
 - Discord Bot
-- WhatsApp (geplant)
+- Replay Benachrichtigungen
+- Highlight Meldungen
+- WhatsApp Integration
 
-### 📱 Social Media
+---
 
-- TikTok Ready Exporte
+## 📱 Social Media
+
+### Geplant
+
+- TikTok Export
+- YouTube Shorts Export
 - Thumbnail Erstellung
 - Hashtag Generierung
+- Caption Generierung
 
-## Geplanter Technologiestack
+---
+
+# 🏗️ Technologie
 
 - Python
 - FastAPI
@@ -47,93 +89,95 @@ DartReplay ist eine Plattform zur automatischen Analyse von Dartspielen, Erkennu
 - Docker
 - Linux
 - FFmpeg
-- Discord.py
-- React
+- SQLAlchemy
+- WebSockets
+- GitHub
 
-## Projektstatus
+---
 
+# 🚧 Projektstatus
 
-🚀 Aktive Entwicklung
+## Aktueller Entwicklungsstand
 
-Der aktuelle Entwicklungsstand umfasst:
-
-✅ Automatische Replay-Erstellung
-
-✅ SCOLIA-Anbindung
-
-✅ Zwei-Kamera-System
-
-✅ Ringbuffer-Aufzeichnung
-
-✅ Timeline-Engine
-
-✅ Automatische Clip-Erstellung
-
-✅ TV-Style Replay-Schnitt
-
-✅ Mainstream-Kameraaufnahme
-
-✅ FFmpeg-basierte Replay-Generierung
-
-Aktuell wird das Timing zwischen Player- und Board-Kamera weiter optimiert.
-Architektur und Roadmap erstellt.
-
-
-# ✅ Aktueller Stand
-
-## Infrastruktur
+### Infrastruktur
 
 - ✅ VPS eingerichtet
-- ✅ Ubuntu 22.04 LTS installiert
-- ✅ SSH-Zugriff eingerichtet
-- ✅ Git konfiguriert
-- ✅ GitHub Repository angebunden
-- ✅ Docker installiert
-- ✅ Docker Compose installiert
-
-## Backend
-
-- ✅ Python 3 installiert
-- ✅ FastAPI eingerichtet
-- ✅ Swagger API Dokumentation verfügbar (`/docs`)
-- ✅ Erste produktive API erstellt
-
-## Datenbank
-
+- ✅ Ubuntu Server installiert
+- ✅ Docker eingerichtet
 - ✅ PostgreSQL eingerichtet
-- ✅ PostgreSQL läuft in Docker
-- ✅ SQLAlchemy integriert
-- ✅ FastAPI erfolgreich mit PostgreSQL verbunden
-- ✅ Datenbankverbindung erfolgreich getestet
+- ✅ GitHub Integration
 
-## SCOLIA Integration
+### SCOLIA Integration
 
-✅ SCOLIA WebSocket Client erstellt
+- ✅ Verbindung zu SCOLIA
+- ✅ WebSocket Kommunikation
+- ✅ Wurferkennung
+- ✅ Erfassung von Wurfzeitpunkten
+- ✅ Verarbeitung von THROW_DETECTED Events
 
-✅ Verbindung zum SCOLIA Board erfolgreich hergestellt
+### Kamerasystem
 
-✅ Authentifizierung über Access Token erfolgreich
+- ✅ Board Kamera
+- ✅ Player Kamera
+- ✅ RTSP Streams
+- ✅ Ringbuffer System
+- ✅ Mainstream Recording
+- ✅ Audioaufzeichnung
+- ✅ Segmentierte Buffer-Dateien
 
-✅ HELLO_CLIENT erfolgreich empfangen
+### Replay Engine
 
-✅ Erste echte Wurfdaten (THROW_DETECTED) empfangen
+- ✅ Replay Queue
+- ✅ Timeline Engine
+- ✅ Buffer Matcher
+- ✅ Offset Berechnung
+- ✅ Clip Erstellung
+- ✅ Replay Rendering
+- ✅ TV Replay Ausgabe
+- ✅ Mainstream Replay Pipeline
 
-✅ Vorbereitung für automatische Wurfspeicherung abgeschlossen
+---
 
-### Empfangene Live-Daten
+# 🎯 Aktueller Fokus
 
-- Sektor (z. B. S14, T20, D16)
-- X/Y-Koordinaten
+### Replay Fine Tuning
+
+- Optimierung der Replay-Synchronisation
+- Feintuning der Player-Kamera
+- Feintuning der Board-Kamera
+- Verbesserung der automatischen Regie
+- Celebration-Clip nach dem dritten Dart
+
+### Nächste große Meilensteine
+
+1. Highlight Detection Engine
+2. Dashboard
+3. Discord Bot
+4. Highlight Bibliothek
+5. Social Media Export
+
+---
+
+# 📡 Aktuell empfangene SCOLIA-Daten
+
+- Sektor (S1–S20, T1–T20, D1–D20)
+- X/Y Koordinaten
 - Horizontaler Winkel
 - Vertikaler Winkel
-- Bounceout-Status
+- Bounceout Status
 - Zeitstempel
 - Sektorvorschläge
 
+---
 
+# 🎯 Vision
 
-Replay every great moment.
+DartReplay soll Dartspielern ermöglichen:
 
-DartReplay soll Dartspielern ermöglichen,
-Highlights automatisch zu erkennen,
-Replay-Videos zu erstellen und persönliche Statistiken auszuwerten.
+- Highlights automatisch zu erkennen
+- Replays automatisch zu erzeugen
+- besondere Momente festzuhalten
+- Spiele professionell aufzubereiten
+- zukünftig statistische Auswertungen und Highlight-Bibliotheken zu nutzen
+
+**Replay every great moment.**
