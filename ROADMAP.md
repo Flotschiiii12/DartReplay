@@ -198,7 +198,6 @@ SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
 - [ ] Highlight Bibliothek
 
 ---
-
 # 🔥 Aktueller Fokus
 
 1. Replay Timing perfektionieren
