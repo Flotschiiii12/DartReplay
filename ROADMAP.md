@@ -31,6 +31,8 @@
 - [x] Mainstream Integration
 - [x] Mainstream → 720p Transcoding
 - [x] Automatischer Recorder Start
+- [x] TS-Ringbuffer System
+- [x] Automatisches TS-Ringbuffer Cleanup
 
 ---
 
@@ -49,6 +51,10 @@
 - [x] Mainstream Replay Pipeline
 - [x] Automatische Replay Erstellung
 - [x] Replay Rendering End-to-End
+- [x] Replay Visit Queue System
+- [x] Datenbankbasierte Replay Trigger
+- [x] TS Segment Matching
+- [x] Segmentauswahl mit Best-Match Logik
 
 ---
 
@@ -60,6 +66,10 @@
 - [x] Mainstream Replay erfolgreich
 - [x] Segment-Matching Fehler behoben
 - [x] Mainstream Buffer stabilisiert
+- [x] Replay Queue Stabilisierung
+- [x] Mehrfach-Visit Replay Bug behoben
+- [x] Überlappende TS-Segmente korrekt aufgelöst
+- [x] Replay Rendering für schnelle Folge-Visits stabilisiert
 
 ### Offen
 
@@ -70,6 +80,8 @@
 - [ ] Celebration Clip nach Dart 3
 - [ ] Jubel Kamera
 - [ ] Slow Motion Replays
+- [ ] TV-Regie Übergänge
+- [ ] Dynamische Clip-Längen
 
 ---
 
@@ -80,6 +92,8 @@
 - [x] SCOLIA Event Verarbeitung
 - [x] Wurfzeitpunkte extrahieren
 - [x] Replay Trigger aus SCOLIA Daten
+- [x] Automatische Visit-Erkennung
+- [x] Replay Queue Speicherung
 
 ### Offen
 
@@ -188,6 +202,9 @@ SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
 - [x] TV Replay Ausgabe
 - [x] Mainstream Recording
 - [x] Mainstream Replay Pipeline
+- [x] Datenbankbasierte Replay Trigger
+- [x] TS-Ringbuffer Architektur
+- [x] Stabile Mehrfach-Visit Replays
 
 ## Für Version 1.0 noch offen
 
@@ -198,10 +215,23 @@ SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
 - [ ] Highlight Bibliothek
 
 ---
+
 # 🔥 Aktueller Fokus
 
 1. Replay Timing perfektionieren
 2. Celebration Clip nach Dart 3
-3. Highlight Detection
-4. Dashboard
-5. Discord Bot
+3. Slow Motion Replays
+4. Highlight Detection
+5. Dashboard
+6. Discord Bot
+
+---
+
+# ✅ Letzte große Erfolge (17.07.2026)
+
+- Replay Queue System vollständig stabilisiert
+- Bug bei mehreren schnellen Visits behoben
+- TS-Segmentauswahl auf Best-Match Logik umgestellt
+- Automatisches TS-Ringbuffer Cleanup repariert
+- Ringbuffer von über 550 Segmenten zurück auf ~30 Segmente pro Kamera reduziert
+- Drei schnelle Test-Visits erfolgreich und fehlerfrei als Replay erzeugt
