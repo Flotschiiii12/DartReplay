@@ -21,7 +21,10 @@ def find_ts_file(timestamp, prefix):
         )
     )
 
-    for file in reversed(files):
+    best_match = None
+    best_offset = None
+
+    for file in files:
 
         try:
             file_time = datetime.strptime(
@@ -34,19 +37,47 @@ def find_ts_file(timestamp, prefix):
         except Exception:
             continue
 
-        if file_time <= target:
-            print(
-                f"[FIND] target={target} "
-                f"file={file} "
-                f"file_time={file_time}"
-            )
-            return {
+        if file_time > target:
+            continue
+
+        offset = (
+            target - file_time
+        ).total_seconds()
+
+        if offset > 62.5:
+            continue
+
+        probe = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                str(file)
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+        if probe.returncode != 0:
+            print(f"[SKIP INVALID] {file}")
+            continue
+
+        if best_offset is None or offset < best_offset:
+            best_offset = offset
+            best_match = {
                 "file": str(file),
                 "timestamp": file_time
             }
 
-    return None
+    if best_match:
+        print(
+            f"[FIND] target={target} "
+            f"file={best_match['file']} "
+            f"offset={best_offset}"
+        )
+        return best_match
 
+    return None
 
 def load_timeline():
 
