@@ -1,10 +1,10 @@
-# 🎯 DartReplay 🎯
+# 🎯 DartReplay
 
 **Replay every great moment.**
 
-DartReplay ist eine Plattform zur automatischen Erstellung von Dart-Replays, Highlight-Erkennung und zukünftigen statistischen Auswertungen.
+DartReplay ist eine Plattform zur automatischen Erstellung von Dart-Replays auf Basis von SCOLIA-Daten und einem Multi-Kamera-System.
 
-Der aktuelle Fokus liegt auf einer professionellen Replay-Engine mit automatischer Wurferkennung über SCOLIA und einer TV-ähnlichen Videoregie.
+Ziel des Projekts ist eine vollautomatische Replay- und Highlight-Plattform für Dartspieler – inklusive TV-ähnlicher Regie, Highlight-Erkennung, Statistiksystem und zukünftiger Social-Media-Integration.
 
 ---
 
@@ -16,25 +16,34 @@ Der aktuelle Fokus liegt auf einer professionellen Replay-Engine mit automatisch
 
 - ✅ Automatische Replay-Erstellung
 - ✅ SCOLIA-basierte Wurferkennung
+- ✅ Replay-Trigger aus SCOLIA Events
+- ✅ Datenbankbasierte Replay Queue
 - ✅ Zwei-Kamera-System (Player + Board)
-- ✅ Ringbuffer-Aufzeichnung
+- ✅ Mainstream-Aufzeichnung
+- ✅ Audioaufzeichnung
+- ✅ TS-Ringbuffer-System
 - ✅ Segmentierte Videoaufnahme
-- ✅ Mainstream-Kameraunterstützung
+- ✅ Automatisches Buffer-Matching
+- ✅ Offset-basierte Segmentzuordnung
 - ✅ Timeline-basierte Replay-Regie
 - ✅ Automatische Clip-Erstellung
+- ✅ Automatische Kameraumschaltung
 - ✅ TV-Style Replay-Ausgabe
 - ✅ FFmpeg Rendering Pipeline
-- ✅ Buffer-Matching System
-- ✅ Automatische Kameraumschaltung
 - ✅ Mainstream Replay Pipeline
 - ✅ 1280x720 Replay-Aufzeichnung
+- ✅ Automatische Replay-Erstellung nach Takeouts
+- ✅ Stabile Verarbeitung mehrerer schneller Visits
+- ✅ Best-Match Segmentauswahl für überlappende Buffer-Dateien
 
 ### Geplante Erweiterungen
 
 - ⏳ Celebration-Cam
 - ⏳ Slow Motion Replays
-- ⏳ Erweiterte Kameraregie
-- ⏳ Highlight-Zusammenschnitte
+- ⏳ Dynamische Replay-Regie
+- ⏳ Mehrere Kameraperspektiven
+- ⏳ TV-Style Übergänge
+- ⏳ Automatische Highlight-Zusammenschnitte
 
 ---
 
@@ -46,15 +55,17 @@ Der aktuelle Fokus liegt auf einer professionellen Replay-Engine mit automatisch
 - First 9 Average
 - Checkout %
 - High Finishes
+- Legs & Sets
 - Matchhistorie
 - Rekorde
 - Spielerstatistiken
+- Persönliche Leistungsanalyse
 
-### Aktueller Hinweis
+### Hinweis
 
 SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
 
-Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und Statistikauswertung benötigt.
+Für zukünftige Analytics-Funktionen wird daher eine eigene Matchengine mit eigener Datenhaltung und Statistikberechnung verwendet.
 
 ---
 
@@ -65,6 +76,7 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 - Discord Bot
 - Replay Benachrichtigungen
 - Highlight Meldungen
+- Replay Abruf per Slash Command
 - WhatsApp Integration
 
 ---
@@ -75,6 +87,7 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 
 - TikTok Export
 - YouTube Shorts Export
+- Automatische Highlight Videos
 - Thumbnail Erstellung
 - Hashtag Generierung
 - Caption Generierung
@@ -83,23 +96,62 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 
 # 🏗️ Technologie
 
+## Backend
+
 - Python
 - FastAPI
 - PostgreSQL
-- Docker
-- Linux
-- FFmpeg
 - SQLAlchemy
 - WebSockets
+
+## Video
+
+- FFmpeg
+- RTSP Streams
+- TS-Ringbuffer
+- Timeline-basierte Replay-Regie
+- Multi-Kamera Rendering
+
+## Infrastruktur
+
+- Linux VPS
+- Docker
 - GitHub
+
+---
+
+# 📂 Systemarchitektur
+
+```text
+SCOLIA
+   │
+   ▼
+Event Verarbeitung
+   │
+   ▼
+Replay Queue
+   │
+   ▼
+Timeline Engine
+   │
+   ▼
+Segment Matching
+   │
+   ▼
+Clip Rendering
+   │
+   ▼
+Replay Renderer
+   │
+   ▼
+TV Replay Ausgabe
+```
 
 ---
 
 # 🚧 Projektstatus
 
-## Aktueller Entwicklungsstand
-
-### Infrastruktur
+## Infrastruktur
 
 - ✅ VPS eingerichtet
 - ✅ Ubuntu Server installiert
@@ -107,48 +159,76 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 - ✅ PostgreSQL eingerichtet
 - ✅ GitHub Integration
 
-### SCOLIA Integration
+## SCOLIA Integration
 
 - ✅ Verbindung zu SCOLIA
 - ✅ WebSocket Kommunikation
 - ✅ Wurferkennung
-- ✅ Erfassung von Wurfzeitpunkten
-- ✅ Verarbeitung von THROW_DETECTED Events
+- ✅ Wurfzeitpunkte
+- ✅ Replay Trigger
+- ✅ Takeout Verarbeitung
 
-### Kamerasystem
+## Kamerasystem
 
 - ✅ Board Kamera
 - ✅ Player Kamera
 - ✅ RTSP Streams
-- ✅ Ringbuffer System
 - ✅ Mainstream Recording
 - ✅ Audioaufzeichnung
+- ✅ TS-Ringbuffer
 - ✅ Segmentierte Buffer-Dateien
+- ✅ Automatisches Ringbuffer Cleanup
 
-### Replay Engine
+## Replay Engine
 
 - ✅ Replay Queue
+- ✅ Visit Queue System
 - ✅ Timeline Engine
 - ✅ Buffer Matcher
 - ✅ Offset Berechnung
+- ✅ Segment Matching
 - ✅ Clip Erstellung
 - ✅ Replay Rendering
 - ✅ TV Replay Ausgabe
 - ✅ Mainstream Replay Pipeline
+- ✅ Automatische Replay Erstellung
+- ✅ Mehrfach-Visit Verarbeitung
+- ✅ Replay Stabilisierung
+
+---
+
+# ✅ Aktuelle Erfolge
+
+### Replay Engine Stabilisierung
+
+- Replay Queue erfolgreich implementiert
+- Segment-Matching Fehler behoben
+- Überlappende TS-Segmente korrekt aufgelöst
+- Mehrfach-Visit Replay Bug behoben
+- Replay Rendering Pipeline stabilisiert
+- Drei schnelle Test-Visits erfolgreich als Replays verarbeitet
+
+### Ringbuffer System
+
+- TS-Ringbuffer Architektur eingeführt
+- Automatisches Cleanup integriert
+- Ringbuffer auf 30 Segmente pro Kamera begrenzt
+- Speicherverbrauch deutlich reduziert
 
 ---
 
 # 🎯 Aktueller Fokus
 
-### Replay Fine Tuning
+## Replay Fine Tuning
 
-- Optimierung der Replay-Synchronisation
-- Feintuning der Player-Kamera
-- Feintuning der Board-Kamera
-- Verbesserung der automatischen Regie
-- Celebration-Clip nach dem dritten Dart
+- Player Timing perfektionieren
+- Board Timing perfektionieren
+- Dartflug optimieren
+- Einschlag optimieren
+- Celebration-Clip nach Dart 3
+- Jubel-Kamera integrieren
 
-### Nächste große Meilensteine
+## Nächste Meilensteine
 
 1. Highlight Detection Engine
 2. Dashboard
@@ -158,7 +238,7 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 
 ---
 
-# 📡 Aktuell empfangene SCOLIA-Daten
+# 📡 Aktuell genutzte SCOLIA-Daten
 
 - Sektor (S1–S20, T1–T20, D1–D20)
 - X/Y Koordinaten
@@ -174,10 +254,12 @@ Für zukünftige Analytics-Funktionen wird daher eine eigene Datenhaltung und St
 
 DartReplay soll Dartspielern ermöglichen:
 
-- Highlights automatisch zu erkennen
 - Replays automatisch zu erzeugen
-- besondere Momente festzuhalten
+- Highlights automatisch zu erkennen
+- Besondere Momente dauerhaft festzuhalten
 - Spiele professionell aufzubereiten
-- zukünftig statistische Auswertungen und Highlight-Bibliotheken zu nutzen
+- Persönliche Statistiken auszuwerten
+- Highlight-Bibliotheken aufzubauen
+- Social-Media-Inhalte automatisch zu generieren
 
 **Replay every great moment.**
