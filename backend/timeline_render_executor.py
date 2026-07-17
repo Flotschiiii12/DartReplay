@@ -1,9 +1,10 @@
 import json
 import sys
 import subprocess
+from pathlib import Path
+from datetime import datetime
 
 from timeline_video_builder import build_video_jobs
-
 from buffer_file_matcher import find_buffer_file
 from buffer_offset_calculator import calculate_buffer_offset
 
@@ -16,6 +17,34 @@ def load_timeline():
             return json.load(f)
 
     return None
+
+
+def get_next_buffer_file(current_file):
+
+    current = Path(current_file)
+
+    if current.name.startswith("player_"):
+        prefix = "player"
+    else:
+        prefix = "board"
+
+    files = sorted(
+        Path("/opt/dartreplay/buffer").glob(
+            f"{prefix}_*.mp4"
+        )
+    )
+
+    files = [str(f) for f in files]
+
+    try:
+        idx = files.index(str(current))
+    except ValueError:
+        return current_file
+
+    if idx + 1 < len(files):
+        return files[idx + 1]
+
+    return current_file
 
 
 def execute_jobs():
@@ -36,16 +65,10 @@ def execute_jobs():
 
         event = job["event"]
 
-        if event == "pre_throw_1":
+        if event in ["pre_throw_1", "throw_1"]:
             ts = timeline["throw_1"].split(".")[0]
 
-        elif event == "throw_1":
-            ts = timeline["throw_1"].split(".")[0]
-
-        elif event == "pre_throw_2":
-            ts = timeline["throw_2"].split(".")[0]
-
-        elif event == "throw_2":
+        elif event in ["pre_throw_2", "throw_2"]:
             ts = timeline["throw_2"].split(".")[0]
 
         elif event == "throw_3":
@@ -56,10 +79,7 @@ def execute_jobs():
 
         if job["camera"] == "player":
 
-            match = find_buffer_file(
-                ts,
-                "player"
-            )
+            match = find_buffer_file(ts, "player")
 
             if not match:
                 print("Kein Player-Buffer gefunden")
@@ -72,17 +92,11 @@ def execute_jobs():
                 match["timestamp"]
             )
 
-            offset = max(
-                0,
-                offset + 3.0
-            )
+            offset = max(0, offset + 3.0)
 
         else:
 
-            match = find_buffer_file(
-                ts,
-                "board"
-            )
+            match = find_buffer_file(ts, "board")
 
             if not match:
                 print("Kein Board-Buffer gefunden")
@@ -95,10 +109,12 @@ def execute_jobs():
                 match["timestamp"]
             )
 
-            offset = max(
-                0,
-                offset - 0.5
-            )
+            offset = max(0, offset - 0.5)
+
+        if offset + job["duration"] > 60:
+
+            source = get_next_buffer_file(source)
+            offset = 0
 
         print(
             f"Render {event} "
@@ -111,26 +127,16 @@ def execute_jobs():
             [
                 "ffmpeg",
                 "-y",
+                "-i",
                 "-ss",
                 str(offset),
-                "-i",
                 source,
                 "-t",
                 str(job["duration"]),
-                "-vf",
-                "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2",
-                "-r",
-                "30",
-                "-c:v",
-                "libx264",
-                "-preset",
-                "ultrafast",
-                "-crf",
-                "23",
-                "-c:a",
-                "aac",
+                "-c",
+                "copy",
                 job["output"]
-            ]
+            ],
         )
 
     print("✅ Timeline erstellt")

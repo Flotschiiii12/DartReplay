@@ -1,4 +1,3 @@
-
 import asyncio
 import json
 import websockets
@@ -8,68 +7,91 @@ from config import SERIAL_NUMBER, ACCESS_TOKEN
 
 
 async def main():
-    connection = psycopg2.connect(
-        host="localhost",
-        database="dartreplay",
-        user="dartreplay",
-        password="dartreplay123"
-    )
 
-    cursor = connection.cursor()
+    while True:
 
-    websocket_url = (
-        f"wss://game.scoliadarts.com/api/v1/social"
-        f"?serialNumber={SERIAL_NUMBER}"
-        f"&accessToken={ACCESS_TOKEN}"
-    )
+        connection = None
 
-    print(websocket_url)
+        try:
 
-    async with websockets.connect(websocket_url) as websocket:
-        print("Verbunden!")
+            connection = psycopg2.connect(
+                host="localhost",
+                database="dartreplay",
+                user="dartreplay",
+                password="dartreplay123"
+            )
 
-        while True:
-            message = await websocket.recv()
+            cursor = connection.cursor()
 
-            data = json.loads(message)
+            websocket_url = (
+                f"wss://game.scoliadarts.com/api/v1/social"
+                f"?serialNumber={SERIAL_NUMBER}"
+                f"&accessToken={ACCESS_TOKEN}"
+            )
 
-            print(data)
+            print(websocket_url)
+            print("Verbinde zu SCOLIA...")
 
-            if data["type"] == "THROW_DETECTED":
+            async with websockets.connect(websocket_url) as websocket:
 
-                payload = data["payload"]
+                print("✅ Verbunden!")
 
-                cursor.execute(
-                    """
-                    INSERT INTO throws
-                    (
-                        sector,
-                        x,
-                        y,
-                        bounceout,
-                        detection_time
-                    )
-                    VALUES
-                    (
-                        %s,
-                        %s,
-                        %s,
-                        %s,
-                        %s
-                    )
-                    """,
-                    (
-                        payload["sector"],
-                        payload["coordinates"][0],
-                        payload["coordinates"][1],
-                        payload["bounceout"],
-                        payload["detectionTime"]
-                    )
-                )
+                while True:
 
-                connection.commit()
+                    message = await websocket.recv()
 
-                print("✅ Wurf gespeichert")
+                    data = json.loads(message)
+
+                    print(data)
+
+                    if data.get("type") == "THROW_DETECTED":
+
+                        payload = data["payload"]
+
+                        cursor.execute(
+                            """
+                            INSERT INTO throws
+                            (
+                                sector,
+                                x,
+                                y,
+                                bounceout,
+                                detection_time
+                            )
+                            VALUES
+                            (
+                                %s,
+                                %s,
+                                %s,
+                                %s,
+                                %s
+                            )
+                            """,
+                            (
+                                payload["sector"],
+                                payload["coordinates"][0],
+                                payload["coordinates"][1],
+                                payload["bounceout"],
+                                payload["detectionTime"]
+                            )
+                        )
+
+                        connection.commit()
+
+                        print("✅ Wurf gespeichert")
+
+        except Exception as e:
+
+            print(f"❌ SCOLIA ERROR: {e}")
+            print("🔄 Reconnect in 5 Sekunden...")
+
+            try:
+                if connection:
+                    connection.close()
+            except Exception:
+                pass
+
+            await asyncio.sleep(5)
 
 
 asyncio.run(main())

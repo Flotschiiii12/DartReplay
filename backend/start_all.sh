@@ -8,7 +8,11 @@ pkill -f camera_recorder_board.py
 pkill -f camera_recorder_player.py
 pkill -f ringbuffer_manager.py
 
-sleep 2
+pkill -f "h264Preview_01_main"
+pkill -f "/opt/dartreplay/ts_ring"
+pkill -f "/opt/dartreplay/buffer"
+
+sleep 3
 
 nohup python3 scolia/client.py > /tmp/scolia.log 2>&1 &
 nohup python3 camera_recorder_board.py > /tmp/board.log 2>&1 &

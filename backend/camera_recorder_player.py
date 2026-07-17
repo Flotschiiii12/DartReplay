@@ -1,34 +1,55 @@
 import subprocess
+import threading
 import time
-from datetime import datetime
-
-RTSP_URL = "rtsp://admin:florian123!@192.168.2.178:554/h264Preview_01_main"
+from pathlib import Path
+import time
 
 while True:
-
-    filename = datetime.now().strftime(
-        "/opt/dartreplay/buffer/player_%Y%m%d_%H%M%S.mp4"
-    )
-
     try:
+        subprocess.run([
+            "ffmpeg",
+            "-y",
+            "-rtsp_transport", "tcp",
+            "-fflags", "+genpts",
+            "-i", "rtsp://admin:florian123!@192.168.2.178:554/h264Preview_01_main",
+            "-vf", "scale=1280:720,fps=20",
 
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-y",
-                "-rtsp_transport", "tcp",
-                "-i", RTSP_URL,
-                "-t", "60",
-                "-vf", "scale=1280:720",
-                "-c:v", "libx264",
-                "-preset", "ultrafast",
-                "-c:a", "aac",
-                filename
-            ],
-            timeout=75
-        )
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-crf", "23",
 
-    except subprocess.TimeoutExpired:
-        print("Player timeout")
+            "-an",
+            "-f", "segment",
+            "-segment_time", "60",
+            "-reset_timestamps", "1",
+            "-strftime", "1",
 
-    time.sleep(1)
+            "/opt/dartreplay/ts_ring/player/player_%Y%m%d_%H%M%S.mp4"
+        ])
+    except Exception as e:
+        print("PLAYER ERROR:", e)
+
+    time.sleep(5)
+
+
+def cleanup_ringbuffer():
+    while True:
+        try:
+            files = sorted(
+                Path("/opt/dartreplay/ts_ring/player").glob("*.mp4"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True
+            )
+
+            for old_file in files[30:]:
+                old_file.unlink(missing_ok=True)
+
+        except Exception as e:
+            print(f"Cleanup-Fehler: {e}")
+
+        time.sleep(60)
+
+threading.Thread(
+    target=cleanup_ringbuffer,
+    daemon=True
+).start()
