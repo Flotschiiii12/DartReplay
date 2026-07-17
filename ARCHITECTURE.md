@@ -2,73 +2,93 @@
 
 ## System Overview
 
-```text
-                    ┌─────────────────┐
-                    │      SCOLIA     │
-                    │ Throw Detection │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Replay Trigger  │
-                    │ Event Processing│
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │  Replay Queue   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Timeline Engine │
-                    └────────┬────────┘
-                             │
-                 ┌───────────┴───────────┐
-                 ▼                       ▼
-        ┌────────────────┐     ┌────────────────┐
-        │  Player Camera │     │  Board Camera  │
-        └────────┬───────┘     └────────┬───────┘
-                 │                      │
-                 ▼                      ▼
-        ┌────────────────┐     ┌────────────────┐
-        │ RTSP Mainstream│     │ RTSP Mainstream│
-        └────────┬───────┘     └────────┬───────┘
-                 │                      │
-                 ▼                      ▼
-        ┌───────────────────────────────────────┐
-        │      Ringbuffer Recording System      │
-        │      60s Buffer Segments              │
-        │      1280x720 Replay Buffer           │
-        └────────────────┬──────────────────────┘
-                         │
-                         ▼
+
+                    ┌─────────────────────┐
+                    │       SCOLIA        │
+                    │  THROW_DETECTED     │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Event Processing  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  Replay Takeouts    │
+                    │    PostgreSQL       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    Auto Replay      │
+                    │     Visit Queue     │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    Replay Queue     │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Timeline Engine   │
+                    └──────────┬──────────┘
+                               │
+                 ┌─────────────┴─────────────┐
+                 ▼                           ▼
+
+        ┌────────────────┐         ┌────────────────┐
+        │ Player Camera  │         │ Board Camera   │
+        └───────┬────────┘         └───────┬────────┘
+                │                          │
+                ▼                          ▼
+
+        ┌────────────────┐         ┌────────────────┐
+        │ RTSP Mainstream│         │ RTSP Mainstream│
+        └───────┬────────┘         └───────┬────────┘
+                │                          │
+                ▼                          ▼
+
+        ┌─────────────────────────────────────────┐
+        │        TS Ringbuffer Recording          │
+        │     1280x720 Replay Segments            │
+        └─────────────────┬───────────────────────┘
+                          │
+                          ▼
+
                ┌────────────────────┐
-               │ Buffer File Matcher│
+               │ Segment Selection  │
+               │   Best Match       │
                └─────────┬──────────┘
                          │
                          ▼
+
                ┌────────────────────┐
                │ Offset Calculator  │
                └─────────┬──────────┘
                          │
                          ▼
+
                ┌────────────────────┐
                │ Clip Extraction    │
                └─────────┬──────────┘
                          │
                          ▼
+
                ┌────────────────────┐
                │ Timeline Renderer  │
                └─────────┬──────────┘
                          │
                          ▼
+
                ┌────────────────────┐
-               │ Replay Concatenator│
+               │ Replay Renderer    │
                └─────────┬──────────┘
                          │
                          ▼
-                  TV Replay Output
+
+                  🎬 TV Replay Output
 ```
 
 ---
@@ -77,19 +97,26 @@
 
 ## SCOLIA Integration
 
-### Aktuell verfügbar
+### Verfügbar
 
 - THROW_DETECTED Events
 - Wurfzeitpunkte
 - Sektorinformationen
 - Trefferkoordinaten
 - Bounceout Informationen
+- Winkelinformationen
+- Replay Trigger
 
-### Einschränkung
+### Einschränkungen
 
-SCOLIA liefert aktuell keine automatischen Spieler- oder Matchdaten.
+SCOLIA liefert aktuell keine:
 
-Für zukünftige Statistiken werden eigene Datenmodelle benötigt.
+- Spielerinformationen
+- Matchinformationen
+- Leg-/Set-Daten
+- Statistiken
+
+Für spätere Analytics-Funktionen wird eine eigene Match-Engine benötigt.
 
 ---
 
@@ -97,35 +124,77 @@ Für zukünftige Statistiken werden eigene Datenmodelle benötigt.
 
 ### Bereits umgesetzt
 
+- Replay Takeouts
 - Replay Queue
+- Visit Queue
 - Timeline Engine
-- Timeline Builder
-- Buffer File Matching
-- Buffer Offset Berechnung
-- Clip Erstellung
+- Segment Matching
+- Best-Match Segmentauswahl
+- Offset Berechnung
+- Clip Rendering
+- Timeline Rendering
 - Replay Rendering
-- Zwei-Kamera Logik
-- TV Replay Ausgabe
+- TV Replay Export
 
 ### Replay Workflow
 
-```text
+
 SCOLIA Event
+↓
+Replay Takeout
 ↓
 Replay Queue
 ↓
 Timeline Builder
 ↓
-Buffer Matcher
+Segment Matching
+↓
+Best Match Selection
+↓
+Offset Calculation
 ↓
 Player Clip
 ↓
 Board Clip
 ↓
-Timeline Renderer
+Timeline Rendering
 ↓
 Replay Export
+
+
+---
+
+## Best-Match Segment Selection
+
+### Problem
+
+TS-Ringbuffer-Dateien überlappen sich bewusst.
+
+Beispiel:
+
+```text
+player_194723.mp4
+player_194756.mp4
+player_194817.mp4
 ```
+
+Ein einzelner Zeitpunkt kann gleichzeitig in mehreren Segmenten vorhanden sein.
+
+### Lösung
+
+```text
+Timestamp
+↓
+Alle passenden Segmente finden
+↓
+Offset berechnen
+↓
+Segment mit kleinstem Offset auswählen
+↓
+Replay rendern
+```
+
+Dadurch bleiben auch mehrere schnelle Visits stabil und korrekt synchronisiert.
 
 ---
 
@@ -134,40 +203,39 @@ Replay Export
 ### Board Camera
 
 ```text
-Reolink
+Reolink E1 Pro
 ↓
 RTSP Mainstream
 ↓
-FFmpeg
+FFmpeg Recorder
 ↓
-1280x720 Buffer
+TS Ringbuffer
 ```
 
 ### Player Camera
 
-```text
-Reolink
+
+Reolink E1 Pro
 ↓
 RTSP Mainstream
 ↓
-FFmpeg
+FFmpeg Recorder
 ↓
-1280x720 Buffer
+TS Ringbuffer
 ```
 
 ### Eigenschaften
 
-- Mainstream Aufnahme
+- Mainstream Recording
 - Audioaufzeichnung
-- Ringbuffer
-- 60 Sekunden Segmente
+- TS Ringbuffer
 - Automatische Segmentrotation
+- Automatisches Cleanup
+- Replay optimierte Speicherung
 
 ---
 
 ## Recording Pipeline
-
-### Aufnahme
 
 ```text
 RTSP Mainstream
@@ -175,22 +243,27 @@ RTSP Mainstream
 ↓
 FFmpeg Transcoding
 ↓
-1280x720 Buffer Recording
+1280x720 Recording
+↓
+TS Ringbuffer
 ↓
 Replay Engine
 ```
 
-### Buffer System
+### Buffer Format
 
 ```text
 player_YYYYMMDD_HHMMSS.mp4
 board_YYYYMMDD_HHMMSS.mp4
 ```
 
-- Segmentlänge: 60 Sekunden
+### Eigenschaften
+
+- Segmentdauer ~60 Sekunden
+- Überlappende Segmente
 - Automatische Rotation
-- Mainstream Quelle
-- Replay optimierte Speicherung
+- Automatisches Cleanup
+- Maximal ~30 Segmente pro Kamera
 
 ---
 
@@ -198,37 +271,39 @@ board_YYYYMMDD_HHMMSS.mp4
 
 ### Technologien
 
-- FastAPI
 - Python
-- SQLAlchemy
+- FastAPI
 - PostgreSQL
+- SQLAlchemy
 - WebSockets
+- FFmpeg
 
 ### Aufgaben
 
 - Replay Steuerung
-- Event Verarbeitung
 - Queue Verwaltung
+- Event Verarbeitung
 - API Bereitstellung
 - Datenverarbeitung
+- SCOLIA Kommunikation
 
 ---
 
 ## Database
 
-### Aktueller Stand
+### Bereits umgesetzt
 
-- PostgreSQL eingerichtet
-- SQLAlchemy integriert
-- Datenbankanbindung vorhanden
+- players
+- matches
+- throws
+- replay_takeouts
 
-### Geplante Inhalte
+### Geplant
 
-- Spieler
-- Matches
-- Statistiken
-- Highlights
+- Highlight Datenbank
 - Replay Metadaten
+- Eigene Matchengine
+- Statistiksystem
 
 ---
 
@@ -238,6 +313,8 @@ board_YYYYMMDD_HHMMSS.mp4
 
 - TV Replay Videos
 - MP4 Export
+- Replay Archiv
+- Automatische Replay Erstellung
 
 ### Geplant
 
@@ -252,27 +329,88 @@ board_YYYYMMDD_HHMMSS.mp4
 
 # Current Project Status
 
-## Fertig
+## ✅ Fertig
 
-- ✅ Infrastruktur
-- ✅ Kamerasystem
-- ✅ Ringbuffer
-- ✅ Replay Queue
-- ✅ Replay Engine
-- ✅ Mainstream Recording
-- ✅ Mainstream Replay Rendering
-- ✅ TV Replay Export
+### Infrastruktur
 
-## In Arbeit
+- VPS
+- Docker
+- PostgreSQL
+- GitHub Integration
 
-- 🚧 Replay Timing Feintuning
-- 🚧 Kamera-Regie Optimierung
-- 🚧 Celebration Clips
+### Kamerasystem
 
-## Geplant
+- Board Kamera
+- Player Kamera
+- RTSP Integration
+- TS Ringbuffer
+- Mainstream Recording
+- Audioaufzeichnung
+- Automatisches Cleanup
 
-- ⏳ Highlight Engine
-- ⏳ Dashboard
-- ⏳ Discord Bot
-- ⏳ Social Media Export
-- ⏳ Statistiksystem
+### Replay Engine
+
+- Replay Queue
+- Visit Queue
+- Timeline Engine
+- Segment Matching
+- Offset Berechnung
+- Clip Erstellung
+- Replay Rendering
+- TV Replay Ausgabe
+- Multi-Visit Replay Verarbeitung
+
+---
+
+## 🚧 In Arbeit
+
+### Replay Fine Tuning
+
+- Player Timing
+- Board Timing
+- Dartflug Optimierung
+- Einschlag Optimierung
+- Celebration Clip
+- Jubel Kamera
+
+---
+
+## ⏳ Geplant
+
+### Highlight System
+
+- 180 Detection
+- Checkout Detection
+- High Finish Detection
+- Rekord Detection
+
+### Plattform
+
+- Dashboard
+- Discord Bot
+- Highlight Bibliothek
+- Social Media Export
+
+---
+
+# Wichtige Architekturentscheidungen
+
+## Warum TS-Ringbuffer?
+
+- Niedrige Latenz
+- Dauerhafte Aufnahme
+- Schnelle Replay-Erstellung
+- Entkopplung von Aufnahme und Replay-Rendering
+
+## Warum Replay Queue?
+
+- Replays blockieren die Aufnahme nicht
+- Mehrere Replays hintereinander möglich
+- Stabil bei schnellen Folge-Visits
+
+## Warum Best-Match Segment Selection?
+
+- Segmente überlappen sich
+- Mehrere Dateien können denselben Zeitpunkt enthalten
+- Höhere Replay-Genauigkeit
+- Stabilere Synchronisation
