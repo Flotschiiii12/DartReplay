@@ -1,20 +1,25 @@
 # Changelog
 
-## v0.1.0
+---
 
-### Planung
+# v0.1.0 – Projektplanung
+
+## Planung
 
 - Projektname festgelegt
 - VPS Architektur definiert
-- Replay Konzept erstellt
+- Replay-Konzept erstellt
 - Kamerakonzept erstellt
+- Produktvision definiert
 - Roadmap erstellt
-- VPS festgelegt
-- 2 Reolink E1 Pro Kameras beschafft
+- VPS als Hauptplattform festgelegt
+- 2x Reolink E1 Pro Kameras beschafft
 
-## v0.2.0
+---
 
-### Infrastruktur
+# v0.2.0 – Infrastruktur Foundation
+
+## Infrastruktur
 
 - Ubuntu Server eingerichtet
 - Docker installiert
@@ -24,151 +29,268 @@
 - FastAPI installiert
 - Erste API Route erstellt
 
-## v0.2.1
+---
+
+# v0.2.1 – Produktivbetrieb
+
+## Deployment
 
 - GitHub Repository mit VPS verbunden
-- Infrastruktur auf GitHub veröffentlicht
+- Automatische Deployment-Struktur aufgebaut
 - FastAPI Backend produktiv eingerichtet
-- PostgreSQL Datenbank produktiv eingerichtet
+- PostgreSQL produktiv eingerichtet
 
-- ## v0.2.2
+---
 
-### Datenbank
+# v0.2.2 – Datenbankanbindung
+
+## Datenbank
 
 - SQLAlchemy installiert
 - PostgreSQL erfolgreich mit FastAPI verbunden
-- Datenbankverbindung erfolgreich getestet
+- Datenbankverbindung getestet
 
-### Backend
+## Backend
 
 - Datenbank-Engine zentralisiert
-- Testskript für Verbindungsprüfung erstellt
+- Verbindungstest implementiert
 
-- ## v0.2.3
+---
 
-### Datenbank
+# v0.2.3 – Datenmodell
+
+## Datenbank
 
 - Datenbankschema erstellt
 - Players-Tabelle angelegt
 - Matches-Tabelle angelegt
 
-### Backend
+## Backend
 
-- SQLAlchemy-Models erstellt
+- SQLAlchemy Models erstellt
 - Automatische Tabellenerstellung implementiert
 
-`
-## v0.2.4
+---
 
-### Player API
+# v0.2.4 – Player API
+
+## API
 
 - GET /players implementiert
 - POST /players implementiert
-- Swagger UI erfolgreich verwendet
+- Swagger UI erfolgreich getestet
 
-### Datenbank
+## Datenbank
 
 - Erste Testdaten gespeichert
-- PostgreSQL-Schreibzugriffe getestet
-- PostgreSQL-Lesezugriffe getestet
+- Schreibzugriffe getestet
+- Lesezugriffe getestet
 
-### DartReplay
+---
 
-- Erster Spieler erfolgreich gespeichert
-- Erste Daten erfolgreich aus PostgreSQL abgerufen
+# v0.2.5 – Match API
 
-- ## v0.2.5
-
-### Match API
+## API
 
 - GET /matches implementiert
 - POST /matches implementiert
+
+## Datenbank
+
 - Erste Matchdaten gespeichert
-- Matchdaten erfolgreich aus PostgreSQL abrufbar
-
-### Datenbank
-
-- Matches-Tabelle produktiv genutzt
 - Verknüpfung zwischen Spielern und Matches getestet
 
-- ## v0.2.6
+---
 
-### Statistics API
+# v0.2.6 – Statistik Foundation
 
-- Statistik-Endpunkt (/stats) erstellt
-- SQL JOIN zwischen Players und Matches implementiert
-- Player- und Matchdaten erfolgreich verknüpft
-- Erste Statistiken erfolgreich erzeugt und ausgegeben
+## Statistics API
 
-### Backend
+- Statistik-Endpunkt erstellt
+- SQL JOINs implementiert
+- Spieler- und Matchdaten verknüpft
+- Erste Statistiken erzeugt
+
+## Backend
 
 - Erweiterte Datenabfragen implementiert
-- Grundlage für SCOLIA-Import vorbereitet
+- Grundlage für SCOLIA vorbereitet
 
-- ## v0.2.7
+---
 
-### SCOLIA Integration Foundation
+# v0.2.7 – SCOLIA Foundation
+
+## SCOLIA Integration
 
 - Throws-Tabelle erstellt
-- Datenmodell für Wurfdaten vorbereitet
-- SCOLIA-Ordnerstruktur erstellt
-- Erster WebSocket-Client implementiert
-- Authentifizierung über Serial Number und Access Token erfolgreich
+- Datenmodell für Wurfdaten eingeführt
+- SCOLIA Ordnerstruktur erstellt
+- Erster WebSocket Client implementiert
+- Authentifizierung implementiert
 - Verbindung zum SCOLIA Board hergestellt
 - HELLO_CLIENT erfolgreich empfangen
-- Ersten echten THROW_DETECTED Event empfangen
-- Live-Kommunikation mit dem Board erfolgreich getestet
+- Erster THROW_DETECTED Event empfangen
 
-- ## v0.2.8
+---
 
-### Throw Persistence
+# v0.2.8 – Throw Persistence
+
+## SCOLIA
 
 - THROW_DETECTED Events automatisch gespeichert
-- Erste echte SCOLIA-Würfe in PostgreSQL gespeichert
+- Erste echte Würfe in PostgreSQL gespeichert
 - Live-WebSocket-Daten erfolgreich persistiert
 
-- ## v0.2.9
+---
 
-### Throw API
+# v0.2.9 – Throw API & Highlight Foundation
+
+## Throw API
 
 - GET /throws implementiert
-- Echte SCOLIA-Würfe über FastAPI abrufbar
-- Wurfdaten erfolgreich aus PostgreSQL ausgelesen
+- Echte SCOLIA-Würfe per API abrufbar
 
-### Highlight Foundation
+## Highlight Foundation
 
 - GET /highlights implementiert
-- Erste Highlight-Erkennung erstellt
+- Erste Highlight-Erkennung vorbereitet
 - 180-Erkennung vorbereitet
-- ## v3.0.0
 
-### Camera Integration
+---
+
+# v0.3.0 – Kamera Integration
+
+## Kamera Infrastruktur
 
 - Tailscale Subnet Routing eingerichtet
 - Zugriff auf lokales Kameranetz ermöglicht
 - Reolink BoardCam angebunden
 - Reolink PlayerCam angebunden
-- RTSP-Streaming erfolgreich getestet
-- Erste Kamerabilder auf dem VPS gespeichert
+- RTSP Streaming integriert
+- Erste Kamerabilder auf VPS gespeichert
 
-- # v0.4 Mainstream Replay Milestone
+---
+
+# v0.4.0 – Mainstream Replay Milestone
 
 ## Replay Engine
 
 - Replay-Synchronisation verbessert
 - Player-/Board-Schnitt optimiert
-- Timeline-Rendering stabilisiert
+- Timeline Rendering stabilisiert
 - Fehlerhafte Buffer-Zuordnung behoben
-- Unterstützung für 60-Sekunden-Buffersegmente implementiert
+- Unterstützung für 60-Sekunden Buffersegmente implementiert
 
 ## Recording
 
 - Mainstream-Kameras integriert
 - Aufnahme direkt auf 1280x720 normalisiert
 - Gültige MP4-Erstellung stabilisiert
-- Fehler bei Segmentwechseln behoben
+- Segmentwechsel-Probleme behoben
 
 ## Replay Quality
 
-- Deutlich bessere Bildqualität gegenüber Substream
-- 30 FPS Mainstream-Pipeline aktiviert
+- Deutlich verbesserte Bildqualität
+- 30 FPS Mainstream Pipeline aktiviert
+
+---
+
+# v0.5.0 – TV Replay Engine
+
+## Replay System
+
+- Zwei-Kamera Replay System entwickelt
+- TV-Style Replay-Ausgabe eingeführt
+- Automatische Kameraumschaltung implementiert
+- Timeline-basierte Replay-Regie eingeführt
+- FFmpeg Rendering Pipeline aufgebaut
+
+## Buffer System
+
+- Segmentierte Ringbuffer eingeführt
+- Automatisches Buffer Matching implementiert
+- Offset-Berechnung integriert
+- Clip-Erstellung automatisiert
+
+---
+
+# v0.6.0 – Replay Automation
+
+## Automatisierung
+
+- Automatische Replay-Erstellung eingeführt
+- Replay Queue System aufgebaut
+- Replay Rendering End-to-End automatisiert
+- SCOLIA Trigger mit Replay Engine verbunden
+
+## Datenverarbeitung
+
+- Wurfzeitpunkte automatisch ausgewertet
+- Replay Trigger aus SCOLIA Events erzeugt
+
+---
+
+# v0.7.0 – Visit Replay Engine
+
+## Replay Queue 2.0
+
+- Datenbankbasierte Replay Queue eingeführt
+- Replay Takeout Verarbeitung implementiert
+- Visit Queue System entwickelt
+- Mehrere Replay-Jobs hintereinander unterstützt
+
+## Timeline System
+
+- Timeline Builder erweitert
+- Replay Timeline stabilisiert
+- TS-Segment Matching integriert
+
+---
+
+# v0.7.1 – Replay Stabilization Update
+
+## Replay Engine
+
+- Fehler bei schnellen Folge-Visits analysiert
+- Überlappende TS-Ringbuffer-Segmente identifiziert
+- Segmentauswahl vollständig überarbeitet
+- Best-Match Segmentauswahl eingeführt
+
+## Bug Fixes
+
+### Replay Segment Selection
+
+Behoben:
+
+- Falsche Segmentauswahl bei überlappenden Ringbuffer-Dateien
+- Fehlerhafte Replays bei mehreren schnellen Visits
+- Instabile Segmentwechsel innerhalb einer Visit
+
+Neue Logik:
+
+- Auswahl des Segments mit dem kleinsten Offset zum Zielzeitpunkt
+- Deutlich stabilere Replay-Erstellung bei schnellen Folge-Visits
+
+Verifikation:
+
+- Drei schnelle Test-Visits erfolgreich verarbeitet
+- Drei korrekte Replays erzeugt
+
+## Ringbuffer
+
+Behoben:
+
+- Cleanup-System zeigte noch auf das alte Verzeichnis `/camera-segments`
+- TS-Ringbuffer wurde nicht bereinigt
+
+Verbessert:
+
+- Cleanup auf `/ts_ring/player` umgestellt
+- Cleanup auf `/ts_ring/board` umgestellt
+- Automatische Begrenzung auf 30 Segmente pro Kamera wiederhergestellt
+
+Ergebnis:
+
+- Ringbuffer von über 550 Segmenten auf ~30 Segmente pro Kamera reduziert
+- Speicherverbrauch deutlich reduziert
+- Langzeitstabilität verbessert
