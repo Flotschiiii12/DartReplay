@@ -8,7 +8,7 @@ from timeline_engine import get_latest_180_timeline
 
 QUEUE_DIR = Path("/opt/dartreplay/replay_queue")
 
-last_throw = None
+seen_throws = set()
 
 while True:
 
@@ -20,37 +20,40 @@ while True:
             time.sleep(2)
             continue
 
-        current_throw = timeline["throw_3"]
-
-        if current_throw == last_throw:
-            time.sleep(2)
-            continue
-
-        last_throw = current_throw
-
-        queue_file = QUEUE_DIR / (
-            datetime.now().strftime(
-                "%Y%m%d_%H%M%S.json"
-            )
+        throw_id = (
+            timeline["throw_1"],
+            timeline["throw_2"],
+            timeline["throw_3"]
         )
 
-        with open(queue_file, "w") as f:
-            json.dump(
-                timeline,
-                f,
-                indent=4
+        if throw_id not in seen_throws:
+
+            seen_throws.add(throw_id)
+
+            queue_file = QUEUE_DIR / (
+                datetime.now().strftime(
+                    "%Y%m%d_%H%M%S.json"
+                )
             )
 
-        print(f"✅ Queue gespeichert: {queue_file}")
-        print("⏳ Warte 70 Sekunden auf abgeschlossenes Segment...")
-        time.sleep(70)
-        print("⏳ Warte 70 Sekunden auf abgeschlossenes Segment...")
-        time.sleep(70)
-        subprocess.Popen([
-            "python3",
-            "/opt/dartreplay/backend/create_replay.py",
-            str(queue_file)
-        ])
+            with open(queue_file, "w") as f:
+                json.dump(
+                    timeline,
+                    f,
+                    indent=4
+                )
+
+            print(
+                f"✅ Queue gespeichert: {queue_file}"
+            )
+
+            subprocess.Popen(
+                [
+                    "bash",
+                    "-lc",
+                    f"sleep 70 && python3 /opt/dartreplay/backend/create_replay.py {queue_file}"
+                ]
+            )
 
     except Exception as e:
         print(e)

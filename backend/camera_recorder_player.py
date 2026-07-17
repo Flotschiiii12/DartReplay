@@ -1,4 +1,7 @@
 import subprocess
+import threading
+import time
+from pathlib import Path
 import time
 
 while True:
@@ -27,3 +30,26 @@ while True:
         print("PLAYER ERROR:", e)
 
     time.sleep(5)
+
+
+def cleanup_ringbuffer():
+    while True:
+        try:
+            files = sorted(
+                Path("/opt/dartreplay/ts_ring/player").glob("*.mp4"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True
+            )
+
+            for old_file in files[30:]:
+                old_file.unlink(missing_ok=True)
+
+        except Exception as e:
+            print(f"Cleanup-Fehler: {e}")
+
+        time.sleep(60)
+
+threading.Thread(
+    target=cleanup_ringbuffer,
+    daemon=True
+).start()
