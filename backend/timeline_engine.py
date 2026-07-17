@@ -78,9 +78,9 @@ def get_latest_180_timeline():
     if not throws:
         return None
 
-    throw_1 = parse_time(throws[0].detection_time) - timedelta(seconds=4)
-    throw_2 = parse_time(throws[1].detection_time) - timedelta(seconds=4)
-    throw_3 = parse_time(throws[2].detection_time) - timedelta(seconds=4)
+    throw_1 = parse_time(throws[0].detection_time)
+    throw_2 = parse_time(throws[1].detection_time)
+    throw_3 = parse_time(throws[2].detection_time)
 
     delta_1 = (throw_2 - throw_1).total_seconds()
     delta_2 = (throw_3 - throw_2).total_seconds()

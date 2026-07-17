@@ -1,11 +1,18 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+import subprocess
 
 
-def find_buffer_file(
-    timestamp,
-    prefix
-):
+def valid_mp4(path):
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", str(path)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    return result.returncode == 0
+
+
+def find_buffer_file(timestamp, prefix):
 
     target = datetime.strptime(
         timestamp,
@@ -15,18 +22,15 @@ def find_buffer_file(
     files = sorted(
         Path("/opt/dartreplay/buffer").glob(
             f"{prefix}_*.mp4"
-        )
+        ),
+        reverse=True
     )
 
-    if len(files) > 1:
-        files = files[:-1]
-
-    best_match = None
+    candidates = []
 
     for file in files:
 
         try:
-
             file_time = datetime.strptime(
                 file.stem.replace(
                     f"{prefix}_",
@@ -38,15 +42,19 @@ def find_buffer_file(
         except Exception:
             continue
 
-        from datetime import timedelta
-
-        file_end = file_time + timedelta(seconds=60)
+        file_end = file_time + timedelta(seconds=75)
 
         if file_time <= target < file_end:
+            candidates.append(
+                (file, file_time)
+            )
 
-            best_match = {
+    for file, file_time in candidates:
+
+        if valid_mp4(file):
+            return {
                 "file": str(file),
                 "timestamp": file_time
             }
 
-    return best_match
+    return None

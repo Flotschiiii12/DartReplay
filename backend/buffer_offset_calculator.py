@@ -8,7 +8,7 @@ def calculate_buffer_offset(
 
     target = datetime.strptime(
         timestamp,
-        "%Y-%m-%d %H:%M:%S"
+        "%Y-%m-%d %H:%M:%S.%f"
     )
 
     return (

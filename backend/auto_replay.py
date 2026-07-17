@@ -1,4 +1,5 @@
 import json
+import subprocess
 import time
 from pathlib import Path
 from datetime import datetime
@@ -41,6 +42,15 @@ while True:
             )
 
         print(f"✅ Queue gespeichert: {queue_file}")
+        print("⏳ Warte 70 Sekunden auf abgeschlossenes Segment...")
+        time.sleep(70)
+        print("⏳ Warte 70 Sekunden auf abgeschlossenes Segment...")
+        time.sleep(70)
+        subprocess.Popen([
+            "python3",
+            "/opt/dartreplay/backend/create_replay.py",
+            str(queue_file)
+        ])
 
     except Exception as e:
         print(e)
